@@ -4,3 +4,6 @@
 [submodule "jni/SDL2_image"]
 	path = jni/SDL2_image
 	url = https://github.com/davidsiaw/SDL2_image.git
+[submodule "jni/SDL2_ttf"]
+	path = jni/SDL2_ttf
+	url = https://github.com/davidsiaw/SDL2_ttf.git
