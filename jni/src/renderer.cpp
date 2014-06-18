@@ -1,6 +1,6 @@
-#include <SDL2/SDL_image.h>
-#include <SDL2/SDL_ttf.h>
-#include <SDL2/SDL_thread.h>
+#include <SDL_image.h>
+#include <SDL_ttf.h>
+#include <SDL_thread.h>
 
 #include "renderer.h"
 
@@ -125,7 +125,7 @@ SDL_Texture* Renderer::LoadLabel(
 
     SDL_Thread *thread = SDL_CreateThread(LoadFontThread, "LoadFontThread", (void *)renderer_);
     if (thread) {
-        SDL_DetachThread(thread);
+        //SDL_DetachThread(thread); // added in SDL 2.0.2
     } else {
         SDL_Log(SDL_GetError());
     }

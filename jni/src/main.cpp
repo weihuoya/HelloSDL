@@ -1,6 +1,6 @@
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-#include <SDL2/SDL_ttf.h>
+#include <SDL.h>
+#include <SDL_image.h>
+#include <SDL_ttf.h>
 
 
 #include "eventhandler.h"
@@ -10,10 +10,10 @@
 
 
 #if defined(__IPHONEOS__) || defined(__ANDROID__)
-#include <SDL2/SDL_opengles.h>
-#include <SDL2/SDL_opengles2.h>
+#include <SDL_opengles.h>
+#include <SDL_opengles2.h>
 #else
-#include <SDL2/SDL_opengl.h>
+#include <SDL_opengl.h>
 #endif
 
 

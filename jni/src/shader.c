@@ -2,12 +2,12 @@
 #include "shader.h"
 
 #if defined(__IPHONEOS__) || defined(__ANDROID__)
-#include <SDL2/SDL_opengles.h>
-#include <SDL2/SDL_opengles2.h>
+#include <SDL_opengles.h>
+#include <SDL_opengles2.h>
 #else
-#include <SDL2/SDL_opengl.h>
+#include <SDL_opengl.h>
 #endif
-#include <SDL2/SDL_log.h>
+#include <SDL_log.h>
 
 #include <stdio.h>
 #include <stdlib.h>

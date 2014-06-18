@@ -2,7 +2,7 @@
 #ifndef __HelloSDL__renderer__
 #define __HelloSDL__renderer__
 
-#include <SDL2/SDL.h>
+#include <SDL.h>
 #include <vector>
 
 

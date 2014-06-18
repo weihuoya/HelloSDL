@@ -9,7 +9,7 @@
 #ifndef __hellosdl__eventhandler__
 #define __hellosdl__eventhandler__
 
-#include <SDL2/SDL_events.h>
+#include <SDL_events.h>
 
 
 class EventHandler

@@ -4,7 +4,7 @@
 #include "matrix.h"
 
 #include <cstdlib>
-#include <SDL2/SDL_log.h>
+#include <SDL_log.h>
 
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 

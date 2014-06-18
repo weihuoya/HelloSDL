@@ -6,17 +6,19 @@ LOCAL_MODULE := main
 
 SDL_PATH := ../SDL
 
-LOCAL_C_INCLUDES := $(LOCAL_PATH)/$(SDL_PATH)/include
+LOCAL_C_INCLUDES := $(LOCAL_PATH)/$(SDL_PATH)/include \
+    ../SDL2_image \
+    ../SDL2_ttf
 
 # Add your application source files here...
 LOCAL_SRC_FILES := $(SDL_PATH)/src/main/android/SDL_android_main.c \
-	main.cpp \
-	eventhandler.cpp \
-	renderer.cpp \
-	glcontext.cpp \
-	sdlrwops.cpp \
-	matrix.cpp \
-	gltest.cpp
+    main.cpp \
+    eventhandler.cpp \
+    renderer.cpp \
+    glcontext.cpp \
+    sdlrwops.cpp \
+    matrix.cpp \
+    gltest.cpp
 
 LOCAL_SHARED_LIBRARIES := SDL2 SDL2_image SDL2_ttf
 

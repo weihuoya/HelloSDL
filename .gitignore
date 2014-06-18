@@ -1,2 +1,5 @@
+/libs
+/obj
 .DS_Store
-*.[oa]
+*.[oad]
+*.so

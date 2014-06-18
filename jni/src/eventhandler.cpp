@@ -6,7 +6,7 @@
 //  Copyright (c) 2014年 Moqikaka. All rights reserved.
 //
 
-#include <SDL2/SDL_log.h>
+#include <SDL_log.h>
 #include "eventhandler.h"
 
 
