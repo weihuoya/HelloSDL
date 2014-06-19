@@ -5,6 +5,7 @@
 
 #include <cstdlib>
 #include <SDL_log.h>
+#include <SDL_image.h>
 
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 
@@ -81,7 +82,6 @@ void GLTest::initialize()
     //顶点缓存
     glGenBuffers(1, &vertexBuffer_);
     glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer_);
-    CHECK_GL();
 
     // only draw the vertex if there isn’t someting in front of it already
     /*glGenRenderbuffers(1, &depthBuffer_);
@@ -120,7 +120,6 @@ void GLTest::initialize()
     shaderProgram_ = loadShader(fShaderStr, vShaderStr);
 
     glUseProgram(shaderProgram_);
-    CHECK_GL();
 
     free(fShaderStr);
     free(vShaderStr);
@@ -134,7 +133,6 @@ void GLTest::drawFrame()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     loadMatrix();
-    CHECK_GL();
 
     glDrawElements(GL_TRIANGLES, 6 * 6, GL_UNSIGNED_SHORT, 0);
 
@@ -157,30 +155,52 @@ void GLTest::loadData()
 
 
     GLfloat vertices[] = {
-        +0.5f, -0.5f, +0.0f,  1.0f, 0.0f, 0.0f, 1.0f,
-        +0.5f, +0.5f, +0.0f,  0.0f, 1.0f, 0.0f, 1.0f,
-        -0.5f, +0.5f, +0.0f,  0.0f, 0.0f, 1.0f, 1.0f,
-        -0.5f, -0.5f, +0.0f,  1.0f, 1.0f, 0.0f, 1.0f,
+        +0.5f, -0.5f, +0.0f,  1.0f, 0.0f, 0.0f, 1.0f,  1.0f, 0.0f,
+        +0.5f, +0.5f, +0.0f,  1.0f, 0.0f, 0.0f, 1.0f,  1.0f, 1.0f,
+        -0.5f, +0.5f, +0.0f,  0.0f, 1.0f, 0.0f, 1.0f,  0.0f, 1.0f,
+        -0.5f, -0.5f, +0.0f,  0.0f, 1.0f, 0.0f, 1.0f,  0.0f, 0.0f,
 
-        +0.5f, -0.5f, -0.5f,  0.0f, 1.0f, 1.0f, 1.0f,
-        +0.5f, +0.5f, -0.5f,  1.0f, 0.0f, 1.0f, 1.0f,
-        -0.5f, +0.5f, -0.5f,  1.0f, 0.5f, 1.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  1.0f, 0.5f, 0.0f, 1.0f,
+        +0.5f, -0.5f, -0.5f,  1.0f, 0.0f, 0.0f, 1.0f,  1.0f, 0.0f,
+        +0.5f, +0.5f, -0.5f,  1.0f, 0.0f, 0.0f, 1.0f,  1.0f, 1.0f,
+        -0.5f, +0.5f, -0.5f,  0.0f, 1.0f, 0.0f, 1.0f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f, 0.0f, 1.0f,  0.0f, 0.0f,
     };
-    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 7 * 8, vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 9 * 8, vertices, GL_STATIC_DRAW);
 
-    //
+    // position
     GLint positionSlot = glGetAttribLocation(shaderProgram_, "a_position");
     glEnableVertexAttribArray(positionSlot);
-    glVertexAttribPointer(positionSlot, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 7, 0);
+    glVertexAttribPointer(positionSlot, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 9, 0);
 
     //GLint texcoordSlot = glGetAttribLocation(shaderProgram_, "a_texcoord");
     //glEnableVertexAttribArray(texcoordSlot);
     //glVertexAttribPointer(texcoordSlot, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 7, 0);
 
+    // color
     GLint colorSlot = glGetAttribLocation(shaderProgram_, "a_color");
     glEnableVertexAttribArray(colorSlot);
-    glVertexAttribPointer(colorSlot, 4, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 7, BUFFER_OFFSET(12));
+    glVertexAttribPointer(colorSlot, 4, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 9, BUFFER_OFFSET(12));
+
+    // texcoord
+    GLint texcoordSlot = glGetAttribLocation(shaderProgram_, "a_texcoord");
+    glEnableVertexAttribArray(texcoordSlot);
+    glVertexAttribPointer(texcoordSlot, 2, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 9, BUFFER_OFFSET(28));
+
+
+    SDL_Surface * surface = NULL;
+    GLuint tid = 0;
+
+    surface = IMG_Load("floor.png");
+    tid = SurfaceToTexture(surface);
+    SDL_FreeSurface(surface);
+
+    //glBindTexture(GL_TEXTURE_2D, tid);
+    //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    GLint textureSlot = glGetUniformLocation(shaderProgram_, "u_texture");
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, tid);
+    glUniform1i(textureSlot, 0);
 }
 
 void GLTest::loadMatrix()
@@ -189,13 +209,13 @@ void GLTest::loadMatrix()
     float projectionMatrix[16];
     float viewMatrix[16];
     float mvpMatrix[16];
-    float rotateMatrix[16];
+    //float rotateMatrix[16];
 
     float theta = rotate_ * M_PI / 180.0f;
 
-    Matrix::frustumM(projectionMatrix, -ratio, ratio, -1, 1, 3, 4);
-    Matrix::setRotateM(rotateMatrix, rotate_, 0, 0, -1.0f);
-    Matrix::setLookAtM(viewMatrix, 0, 3.0f * sin(theta), 3.0f * cos(theta), 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
+    Matrix::frustumM(projectionMatrix, -1, 1, -1, 1, 3, 7);
+    //Matrix::setRotateM(rotateMatrix, rotate_, 0, 0, -1.0f);
+    Matrix::setLookAtM(viewMatrix, 0, 4.0f * sin(theta), 4.0f * cos(theta), 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
     Matrix::multiplyMM(mvpMatrix, projectionMatrix, viewMatrix);
 
     // setup the viewport
@@ -203,8 +223,6 @@ void GLTest::loadMatrix()
     //this->log(mvpMatrix, 16);
 
     GLint projectionSlot = glGetUniformLocation(shaderProgram_, "a_projection");
-    CHECK_GL();
-
     glUniformMatrix4fv(projectionSlot, 1, 0, mvpMatrix);
     CHECK_GL();
 }
@@ -220,7 +238,6 @@ GLuint GLTest::loadShader(const char *FS, const char *VS)
     } else {
         glAttachShader(shader, fs);
     }
-    CHECK_GL();
 
     GLuint vs = compileShader(VS, GL_VERTEX_SHADER);
     if (vs == 0) {
@@ -228,15 +245,12 @@ GLuint GLTest::loadShader(const char *FS, const char *VS)
     } else {
         glAttachShader(shader, vs);
     }
-    CHECK_GL();
 
     glBindAttribLocation(shader, ATTRIB_VERTEX, "a_position");
     glBindAttribLocation(shader, ATTRIB_TEXTCOORD, "a_texcoord");
     glBindAttribLocation(shader, ATTRIB_COLOR, "a_color");
-    CHECK_GL();
 
     linkShader(shader);
-    CHECK_GL();
 
     glDetachShader(shader, fs);
     glDeleteShader(fs);
@@ -281,6 +295,52 @@ void GLTest::linkShader(GLuint prog)
         SDL_Log("Can't link program");
     }
 }
+
+
+GLuint GLTest::SurfaceToTexture(SDL_Surface *surface)
+{
+#ifndef GL_BGR
+#define GL_BGR 0x80E0
+#define GL_BGRA 0x80E1
+#endif
+    GLuint tid;
+    GLenum texture_format;
+    GLint ncolors;
+    SDL_Surface* s = surface;
+
+    /* Convert SDL_Surface to OpenGL Texture */
+    ncolors = s->format->BytesPerPixel;
+    if (ncolors == 4) {
+        //alpha channel
+        if (s->format->Rmask == 0x000000ff)
+            texture_format = GL_RGBA;
+        else
+            texture_format = GL_BGRA;
+    } else {
+        if (ncolors == 3) {
+            //no alpha channel
+            if (s->format->Rmask == 0x000000ff)
+                texture_format = GL_RGB;
+            else
+                texture_format = GL_BGR;
+        } else {
+            return 0;
+        }
+    }
+
+    glGenTextures(1, &tid);
+    glBindTexture(GL_TEXTURE_2D, tid);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, texture_format, s->w, s->h, 0,
+            texture_format, GL_UNSIGNED_BYTE, s->pixels);
+
+    return tid;
+}
+
 
 void GLTest::flush()
 {

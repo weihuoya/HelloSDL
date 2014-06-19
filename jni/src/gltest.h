@@ -20,6 +20,8 @@ public:
 
     void initialize();
 
+    GLuint SurfaceToTexture(SDL_Surface *surface);
+
     void flush();
 
     void log(const float * m, int n);
