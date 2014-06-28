@@ -15,7 +15,7 @@ GLuint _checkGLError(const char * file, int line)
 }
 
 
-void logMatrix(const float * m, int n)
+void logMatrix(const float * m, int n, int column)
 {
     const int size = 2048;
     int i = 0, k = 0;
@@ -23,7 +23,7 @@ void logMatrix(const float * m, int n)
 
     for(i=0; i < n; ++i)
     {
-        if (i % 4 == 0)
+        if (i % column == 0)
         {
             buff[k++] = '\n';
         }

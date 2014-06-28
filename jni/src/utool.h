@@ -18,7 +18,7 @@
 GLuint _checkGLError(const char * file, int line);
 
 
-void logMatrix(const float * m, int n);
+void logMatrix(const float * m, int n, int column = 4);
 
 
 GLuint loadShader(const char *FS, const char *VS);

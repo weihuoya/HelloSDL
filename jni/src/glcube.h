@@ -15,7 +15,10 @@ public:
     void drawFrame();
 
     void loadMatrix();
-    void loadData();
+    void loadData1();
+    void loadData2();
+
+    void flush();
 
 private:
     SDL_Window * window_;
@@ -25,6 +28,8 @@ private:
     GLuint shaderProgram_;
     GLuint vertexBuffer_;
     GLuint indexBuffer_;
+
+    size_t rotate_;
 };
 
 
