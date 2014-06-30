@@ -111,7 +111,7 @@ GLuint loadTexture(const char * imagefile)
 #define GL_BGR 0x80E0
 #define GL_BGRA 0x80E1
 #endif
-    GLuint tid;
+    GLuint tid = 0;
     GLenum texture_format;
     GLint ncolors;
     SDL_Surface* s = IMG_Load(imagefile);;
@@ -138,13 +138,7 @@ GLuint loadTexture(const char * imagefile)
 
     glGenTextures(1, &tid);
     glBindTexture(GL_TEXTURE_2D, tid);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-    glTexImage2D(GL_TEXTURE_2D, 0, texture_format, s->w, s->h, 0,
-            texture_format, GL_UNSIGNED_BYTE, s->pixels);
+    glTexImage2D(GL_TEXTURE_2D, 0, texture_format, s->w, s->h, 0, texture_format, GL_UNSIGNED_BYTE, s->pixels);
 
     SDL_FreeSurface(s);
 

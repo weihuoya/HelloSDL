@@ -4,7 +4,7 @@
 
 
 #include "eventhandler.h"
-#include "glcube.h"
+#include "glcontext.h"
 
 
 #if defined(__IPHONEOS__) || defined(__ANDROID__)
@@ -65,11 +65,11 @@ int RunEventLoop(SDL_Window * window)
     SDL_Event event;
     EventHandler handler;
 
-    GLCube cube(window);
-    cube.initialize();
+    GLContext context(window);
+    context.initialize();
 
     while (!done) {
-        cube.drawFrame();
+        context.drawFrame();
         while (SDL_PollEvent(&event)) {
             done = handler.OnEventReceived(event);
         }

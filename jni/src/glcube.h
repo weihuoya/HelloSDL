@@ -7,29 +7,18 @@
 class GLCube
 {
 public:
-    GLCube(SDL_Window * window);
+    GLCube();
     ~GLCube();
 
-    void initialize();
+    void init();
 
-    void drawFrame();
+    void load1();
+    void load2();
+    void load3();
 
-    void loadMatrix();
-    void loadData1();
-    void loadData2();
-
-    void flush();
-
+    void draw(GLuint shaderProgram);
 private:
-    SDL_Window * window_;
-    SDL_GLContext glcontext_;
-    SDL_DisplayMode displayMode_;
-
-    GLuint shaderProgram_;
-    GLuint vertexBuffer_;
-    GLuint indexBuffer_;
-
-    size_t rotate_;
+    GLuint * vboids_;
 };
 
 
