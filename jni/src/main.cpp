@@ -64,8 +64,8 @@ int RunEventLoop(SDL_Window * window)
     int done = 0;
     SDL_Event event;
     EventHandler handler;
-
     GLContext context(window);
+
     context.initialize();
 
     while (!done) {

@@ -10,7 +10,6 @@ varying vec2 v_texcoord;
 void main()
 {
     v_color = a_color;
-    //gl_Position = a_position;
     gl_Position = u_mvpmatrix * a_position;
     v_texcoord = a_texcoord;
 }

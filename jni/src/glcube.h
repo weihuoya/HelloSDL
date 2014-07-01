@@ -14,11 +14,11 @@ public:
 
     void load1();
     void load2();
-    void load3();
 
     void draw(GLuint shaderProgram);
 private:
     GLuint * vboids_;
+    GLsizei count_;
 };
 
 

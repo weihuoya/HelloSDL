@@ -21,11 +21,9 @@ static int SDL_PostEvent(SDL_EventType eventType)
     return (posted);
 }
 
-
 EventHandler::EventHandler() : touchId_(0)
 {
 }
-
 
 int EventHandler::OnEventReceived(const SDL_Event& event)
 {

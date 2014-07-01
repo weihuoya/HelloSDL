@@ -11,7 +11,6 @@
 
 #include <SDL_events.h>
 
-
 class EventHandler
 {
 public:
@@ -34,6 +33,7 @@ public:
 
 protected:
     SDL_TouchID touchId_;
+    GLContext * context_;
 };
 
 

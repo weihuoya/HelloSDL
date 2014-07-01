@@ -48,15 +48,14 @@ void GLContext::initialize()
     glViewport(0, 0, displayMode_.w, displayMode_.h);
 
     // projection
-    //float aspect = (float)displayMode_.w / (float)displayMode_.h;
-    float tp[16];
-    //Matrix::setIdentityM(matrixProjection);
+    float aspect = (float)displayMode_.w / (float)displayMode_.h;
+    Matrix::setIdentityM(matrixProjection);
     //Matrix::perspectiveM(matrixProjection, 45.0f, aspect, 3.0f, 7.0f);
-    Matrix::frustumM(matrixProjection, -1, 1, -1, 1, 3, 7);
-    Matrix::setLookAtM(matrixView, 0.0f, 0.0f, 2.0f, 0.0f, 0.0f, -5.0f, 0.0f, 1.0f, 0.0f);
-    Matrix::multiplyMM(tp, matrixProjection, matrixView);
-    memcpy(matrixProjection, tp, sizeof(tp));
+    Matrix::frustumM(matrixProjection, -1.5, 1.5, -2, 2, 2, 10);
 
+    // view
+    //Matrix::setIdentityM(matrixView);
+    Matrix::setLookAtM(matrixView, 0.0f, 0.0f, 4.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
 
     // load
     this->loadShader();
@@ -64,8 +63,11 @@ void GLContext::initialize()
     CHECK_GL();
 
     cube_->init();
-    cube_->load2();
+    cube_->load1();
     CHECK_GL();
+
+    //this->loadMatrix();
+    //logMatrix(matrixMVP, sizeof(matrixMVP)/sizeof(matrixMVP[0]));
 }
 
 
@@ -119,13 +121,13 @@ void GLContext::loadTexture()
 
     // Wrap texture coordinates by repeating
     // f.ex. texture coordinate (1.1, 1.2) is same as (0.1, 0.2)
-    //glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    //glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 }
 
 
@@ -133,13 +135,14 @@ void GLContext::loadMatrix()
 {
     // model
     Matrix::setIdentityM(matrixModel);
-    Matrix::translateM(matrixModel, 0.0f, 0.0f, -5.0f);
     Matrix::setRotateM(matrixModel, rotate_, 1.0f, 0.0f, 0.0f);
+    //Matrix::translateM(matrixModel, 0.0f, 0.0f, -2.0f);
 
     // projection * view * model
-    Matrix::multiplyMM(matrixMVP, matrixProjection, matrixModel);
+    Matrix::multiplyMM(matrixMVP, matrixView, matrixModel);
+    Matrix::multiplyMM(matrixMVP, matrixProjection, matrixMVP);
 
-    Matrix::setIdentityM(matrixMVP);
+    //Matrix::setIdentityM(matrixMVP);
 
     // mvp
     GLint mvpSlot = glGetUniformLocation(shaderProgram_, "u_mvpmatrix");
