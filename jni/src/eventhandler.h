@@ -10,30 +10,33 @@
 #define __hellosdl__eventhandler__
 
 #include <SDL_events.h>
+#include <sigc++/sigc++.h>
 
 class EventHandler
 {
 public:
-    EventHandler();
+    sigc::signal<void> quit;
 
+public:
+    static EventHandler * instance();
     int OnEventReceived(const SDL_Event& event);
 
+    int OnWindowEvent(const SDL_WindowEvent& window);
+    int OnKeyEvent(const SDL_KeyboardEvent& key);
+    int OnFingerEvent(const SDL_TouchFingerEvent& finger);
+    int OnMouseButton(const SDL_MouseButtonEvent& mouse);
+    int OnMouseMotion(const SDL_MouseMotionEvent& mouse);
+    int OnDollarGesture(const SDL_DollarGestureEvent& gesture);
+    int OnMultiGesture(const SDL_MultiGestureEvent& gesture);
 
-    virtual int OnWindowEvent(const SDL_WindowEvent& window);
-    virtual int OnKeyEvent(const SDL_KeyboardEvent& key);
-    virtual int OnFingerEvent(const SDL_TouchFingerEvent& finger);
-    virtual int OnMouseButton(const SDL_MouseButtonEvent& mouse);
-    virtual int OnMouseMotion(const SDL_MouseMotionEvent& mouse);
-    virtual int OnDollarGesture(const SDL_DollarGestureEvent& gesture);
-    virtual int OnMultiGesture(const SDL_MultiGestureEvent& gesture);
+    void onPause();
+    void onResume();
+    int OnQuit();
 
-    virtual void onPause();
-    virtual void onResume();
-    virtual int OnQuit();
+private:
+    EventHandler();
 
-protected:
     SDL_TouchID touchId_;
-    GLContext * context_;
 };
 
 

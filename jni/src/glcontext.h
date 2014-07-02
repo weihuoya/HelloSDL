@@ -8,10 +8,11 @@
 class GLContext
 {
 public:
-    GLContext(SDL_Window * window);
     ~GLContext();
 
-    void initialize();
+    static GLContext * instance();
+
+    void initialize(SDL_Window * window);
 
     void drawFrame();
 
@@ -22,6 +23,9 @@ public:
     void flush();
 
 private:
+    GLContext();
+
+
     SDL_Window * window_;
     SDL_GLContext glcontext_;
     SDL_DisplayMode displayMode_;

@@ -16,24 +16,35 @@ static float matrixMVP[16];
 
 
 
-GLContext::GLContext(SDL_Window * window)
-: window_(window), shaderProgram_(0), textureBuffer_(0), cube_(new GLCube), rotate_(0)
+GLContext::GLContext()
+: window_(0), shaderProgram_(0), textureBuffer_(0), cube_(0), rotate_(0)
 {
-    SDL_GetCurrentDisplayMode(0, &displayMode_);
-    glcontext_ = SDL_GL_CreateContext(window);
 }
-
 
 GLContext::~GLContext()
 {
-    glDeleteProgram(shaderProgram_);
-    glDeleteTextures(1, &textureBuffer_);
-    SDL_GL_DeleteContext(glcontext_);
+    if(shaderProgram_) glDeleteProgram(shaderProgram_);
+    if(textureBuffer_) glDeleteTextures(1, &textureBuffer_);
+
+    if(cube_) delete cube_;
+    if(glcontext_) SDL_GL_DeleteContext(glcontext_);
+}
+
+GLContext * GLContext::instance()
+{
+    static GLContext context;
+    return &context;
 }
 
 
-void GLContext::initialize()
+void GLContext::initialize(SDL_Window * window)
 {
+    SDL_GetCurrentDisplayMode(0, &displayMode_);
+    glcontext_ = SDL_GL_CreateContext(window);
+    cube_ = new GLCube();
+    window_ = window;
+
+
     glEnable(GL_BLEND);
 
     // Enable depth buffer

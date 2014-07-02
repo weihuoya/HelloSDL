@@ -25,6 +25,12 @@ EventHandler::EventHandler() : touchId_(0)
 {
 }
 
+EventHandler * EventHandler::instance()
+{
+    static EventHandler handler;
+    return &handler;
+}
+
 int EventHandler::OnEventReceived(const SDL_Event& event)
 {
     int done = 0;
@@ -166,6 +172,7 @@ void EventHandler::onResume()
 
 int EventHandler::OnQuit()
 {
+    this->quit.emit();
     SDL_Log("[quit]");
     return 0;
 }

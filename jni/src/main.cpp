@@ -58,20 +58,27 @@ int main(int argc, char** argv)
     return 0;
 }
 
+static void OnQuit()
+{
+    SDL_Log("[sigc] on quit event fire");
+}
 
 int RunEventLoop(SDL_Window * window)
 {
     int done = 0;
     SDL_Event event;
-    EventHandler handler;
-    GLContext context(window);
 
-    context.initialize();
+    EventHandler * handler = EventHandler::instance();
+    GLContext * context = GLContext::instance();
+
+    context->initialize(window);
+
+    handler->quit.connect(sigc::ptr_fun(&OnQuit));
 
     while (!done) {
-        context.drawFrame();
+        context->drawFrame();
         while (SDL_PollEvent(&event)) {
-            done = handler.OnEventReceived(event);
+            done = handler->OnEventReceived(event);
         }
     }
 
