@@ -7,3 +7,6 @@
 [submodule "jni/SDL2_ttf"]
 	path = jni/SDL2_ttf
 	url = https://github.com/davidsiaw/SDL2_ttf.git
+[submodule "jni/glm"]
+	path = jni/glm
+	url = https://github.com/g-truc/glm.git
