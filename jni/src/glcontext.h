@@ -22,19 +22,25 @@ public:
 
     void flush();
 
+    void incRotate(float rotateX, float rotateY);
+    void incScale(float scale);
+
 private:
-    GLContext();
+    DISALLOW_IMPLICIT_CONSTRUCTORS(GLContext);
 
 
     SDL_Window * window_;
+    GLCube * cube_;
+
     SDL_GLContext glcontext_;
     SDL_DisplayMode displayMode_;
 
     GLuint shaderProgram_;
     GLuint textureBuffer_;
 
-    GLCube * cube_;
-    size_t rotate_;
+    float rotateX_;
+    float rotateY_;
+    float scale_;
 };
 
 

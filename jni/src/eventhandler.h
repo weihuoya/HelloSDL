@@ -10,13 +10,11 @@
 #define __hellosdl__eventhandler__
 
 #include <SDL_events.h>
-#include <sigc++/sigc++.h>
+#include "utool.h"
+//#include <sigc++/sigc++.h>
 
 class EventHandler
 {
-public:
-    sigc::signal<void> quit;
-
 public:
     static EventHandler * instance();
     int OnEventReceived(const SDL_Event& event);
@@ -29,14 +27,16 @@ public:
     int OnDollarGesture(const SDL_DollarGestureEvent& gesture);
     int OnMultiGesture(const SDL_MultiGestureEvent& gesture);
 
-    void onPause();
-    void onResume();
+    void OnPause();
+    void OnResume();
     int OnQuit();
 
 private:
-    EventHandler();
+    DISALLOW_IMPLICIT_CONSTRUCTORS(EventHandler);
+
 
     SDL_TouchID touchId_;
+    float prevDistance_;
 };
 
 

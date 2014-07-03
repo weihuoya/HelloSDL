@@ -6,8 +6,11 @@
 //  Copyright (c) 2014年 Moqikaka. All rights reserved.
 //
 
+#include <SDL_touch.h>
 #include <SDL_log.h>
+
 #include "eventhandler.h"
+#include "glcontext.h"
 
 
 static int SDL_PostEvent(SDL_EventType eventType)
@@ -21,7 +24,7 @@ static int SDL_PostEvent(SDL_EventType eventType)
     return (posted);
 }
 
-EventHandler::EventHandler() : touchId_(0)
+EventHandler::EventHandler() : touchId_(0), prevDistance_(0.0f)
 {
 }
 
@@ -41,27 +44,30 @@ int EventHandler::OnEventReceived(const SDL_Event& event)
             OnWindowEvent(event.window);
             break;
         case SDL_APP_WILLENTERBACKGROUND:
-            onPause();
+            OnPause();
             break;
         case SDL_APP_WILLENTERFOREGROUND:
-            onResume();
+            OnResume();
             break;
         case SDL_KEYUP:
         case SDL_KEYDOWN:
             //event.key
             OnKeyEvent(event.key);
             break;
-        case SDL_MOUSEMOTION:
+        /*case SDL_MOUSEMOTION:
             OnMouseMotion(event.motion);
             break;
         case SDL_MOUSEBUTTONDOWN:
         case SDL_MOUSEBUTTONUP:
             OnMouseButton(event.button);
-            break;
+            break;*/
         case SDL_FINGERDOWN:
         case SDL_FINGERMOTION:
         case SDL_FINGERUP:
-            OnFingerEvent(event.tfinger);
+            if (SDL_GetNumTouchFingers(event.tfinger.touchId) == 1)
+            {
+                OnFingerEvent(event.tfinger);
+            }
             break;
         case SDL_MULTIGESTURE:
             OnMultiGesture(event.mgesture);
@@ -70,8 +76,7 @@ int EventHandler::OnEventReceived(const SDL_Event& event)
             OnDollarGesture(event.dgesture);
             break;
         case SDL_QUIT:
-            OnQuit();
-            done = 1;
+            done = OnQuit();
             break;
         default:
             break;
@@ -115,24 +120,6 @@ int EventHandler::OnKeyEvent(const SDL_KeyboardEvent& key)
     return 0;
 }
 
-int EventHandler::OnFingerEvent(const SDL_TouchFingerEvent& event)
-{
-    const SDL_Finger *finger = NULL;
-    int i = 0, num = SDL_GetNumTouchFingers(event.touchId);
-
-    for(i=0; i < num; ++i)
-    {
-        finger = SDL_GetTouchFinger(event.touchId, i);
-    }
-
-    if(event.type == SDL_FINGERDOWN)
-    {
-        SDL_Log("[finger] x: %f, y: %f, dx: %f, dy: %f", event.x, event.y, event.dx, event.dy);
-    }
-
-    return 0;
-}
-
 int EventHandler::OnMouseButton(const SDL_MouseButtonEvent& mouse)
 {
     if(mouse.type == SDL_MOUSEBUTTONDOWN)
@@ -154,27 +141,72 @@ int EventHandler::OnDollarGesture(const SDL_DollarGestureEvent& gesture)
     return 0;
 }
 
-int EventHandler::OnMultiGesture(const SDL_MultiGestureEvent& gesture)
+int EventHandler::OnFingerEvent(const SDL_TouchFingerEvent& event)
 {
-    SDL_Log("[gesture] x: %f, y: %f, num: %hu", gesture.x, gesture.y, gesture.numFingers);
+    if(event.type == SDL_FINGERDOWN)
+    {
+    }
+    else if(event.type == SDL_FINGERMOTION)
+    {
+        float dx = event.dx;
+        float dy = event.dy;
+        GLContext::instance()->incRotate(dx > 0 ? 2.0f : -2.0f, dy > 0 ? 2.0f : -2.0f);
+    }
+    else if(event.type == SDL_FINGERUP)
+    {
+    }
+
     return 0;
 }
 
-void EventHandler::onPause()
+int EventHandler::OnMultiGesture(const SDL_MultiGestureEvent& gesture)
+{
+    const SDL_Finger *finger = NULL;
+    SDL_TouchID touchId = gesture.touchId;
+    int i = 0, numFingers = SDL_GetNumTouchFingers(touchId);
+
+    if (touchId_ != touchId)
+    {
+        touchId_ = touchId;
+        prevDistance_ = 0.0f;
+    }
+
+    if (numFingers == 2)
+    {
+        const SDL_Finger * finger0 = SDL_GetTouchFinger(gesture.touchId, 0);
+        const SDL_Finger * finger1 = SDL_GetTouchFinger(gesture.touchId, 1);
+
+        float dx = (finger0->x - finger1->x) * 16;
+        float dy = (finger0->y - finger1->y) * 16;
+        float currDistance = sqrt(dx*dx+dy*dy);
+
+        if (prevDistance_ > 0)
+        {
+            GLContext::instance()->incScale(currDistance > prevDistance_ ? 0.1f : -0.1f);
+        }
+        else
+        {
+            prevDistance_ = currDistance;
+        }
+    }
+
+    return 0;
+}
+
+void EventHandler::OnPause()
 {
     SDL_Log("[pause]");
 }
 
-void EventHandler::onResume()
+void EventHandler::OnResume()
 {
     SDL_Log("[resume]");
 }
 
 int EventHandler::OnQuit()
 {
-    this->quit.emit();
     SDL_Log("[quit]");
-    return 0;
+    return 1;
 }
 
 

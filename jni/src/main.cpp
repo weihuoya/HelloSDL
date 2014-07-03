@@ -58,10 +58,6 @@ int main(int argc, char** argv)
     return 0;
 }
 
-static void OnQuit()
-{
-    SDL_Log("[sigc] on quit event fire");
-}
 
 int RunEventLoop(SDL_Window * window)
 {
@@ -72,8 +68,6 @@ int RunEventLoop(SDL_Window * window)
     GLContext * context = GLContext::instance();
 
     context->initialize(window);
-
-    handler->quit.connect(sigc::ptr_fun(&OnQuit));
 
     while (!done) {
         context->drawFrame();

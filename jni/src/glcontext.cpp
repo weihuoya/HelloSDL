@@ -16,8 +16,10 @@ static float matrixMVP[16];
 
 
 
-GLContext::GLContext()
-: window_(0), shaderProgram_(0), textureBuffer_(0), cube_(0), rotate_(0)
+GLContext::GLContext() :
+    window_(0), cube_(0),
+    shaderProgram_(0), textureBuffer_(0),
+    rotateX_(0.0f), rotateY_(0.0f), scale_(1.0f)
 {
 }
 
@@ -146,7 +148,9 @@ void GLContext::loadMatrix()
 {
     // model
     Matrix::setIdentityM(matrixModel);
-    Matrix::setRotateM(matrixModel, rotate_, 1.0f, 0.0f, 0.0f);
+    Matrix::scaleM(matrixModel, scale_, 1.0f, 1.0f);
+    Matrix::setRotateM(matrixModel, rotateX_, 1.0f, 0.0f, 0.0f);
+    Matrix::setRotateM(matrixModel, rotateY_, 0.0f, 0.0f, 1.0f);
     //Matrix::translateM(matrixModel, 0.0f, 0.0f, -2.0f);
 
     // projection * view * model
@@ -170,8 +174,6 @@ void GLContext::drawFrame()
     cube_->draw(shaderProgram_);
 
     flush();
-
-    rotate_ = (rotate_ + 1) % 360;
 }
 
 
@@ -179,5 +181,19 @@ void GLContext::flush()
 {
     // Swap our back buffer to the front
     SDL_GL_SwapWindow(window_);
+}
+
+
+void GLContext::incRotate(float rotateX, float rotateY)
+{
+    rotateX_ += rotateX;
+    rotateY_ += rotateY;
+    SDL_Log("rotate: (%f, %f)", rotateX_, rotateY_);
+}
+
+void GLContext::incScale(float scale)
+{
+    scale_ += scale;
+    SDL_Log("scale: %f", scale_);
 }
 
