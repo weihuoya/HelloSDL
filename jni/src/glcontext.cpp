@@ -6,25 +6,31 @@
 
 
 // model
-static float matrixModel[16];
+static float modelMatrix[16];
 // view
-static float matrixView[16];
+static float viewMatrix[16];
 // projection
-static float matrixProjection[16];
+static float projectionMatrix[16];
 // projection * view * model
-static float matrixMVP[16];
+static float mvpMatrix[16];
 
 
 
 GLContext::GLContext() :
     window_(0), cube_(0),
-    shaderProgram_(0), textureBuffer_(0),
-    rotateX_(0.0f), rotateY_(0.0f), scale_(1.0f)
+    shaderProgram_(0), textureBuffer_(0)
 {
+    rotateX_ = rotateY_ = 0.0f;
+    accumulatedRotation_ = new float[64];
+    currentRotationX_ = accumulatedRotation_ + 16;
+    currentRotationY_ = currentRotationX_ + 16;
+    temporaryMatrix_ = currentRotationY_ + 16;
 }
 
 GLContext::~GLContext()
 {
+    delete[] accumulatedRotation_;
+
     if(shaderProgram_) glDeleteProgram(shaderProgram_);
     if(textureBuffer_) glDeleteTextures(1, &textureBuffer_);
 
@@ -60,15 +66,18 @@ void GLContext::initialize(SDL_Window * window)
     // setup the viewport
     glViewport(0, 0, displayMode_.w, displayMode_.h);
 
+    // rotation
+    Matrix::setIdentityM(accumulatedRotation_);
+
     // projection
     float aspect = (float)displayMode_.w / (float)displayMode_.h;
-    Matrix::setIdentityM(matrixProjection);
-    //Matrix::perspectiveM(matrixProjection, 45.0f, aspect, 3.0f, 7.0f);
-    Matrix::frustumM(matrixProjection, -1.5, 1.5, -2, 2, 2, 10);
+    Matrix::setIdentityM(projectionMatrix);
+    //Matrix::perspectiveM(projectionMatrix, 45.0f, aspect, 3.0f, 7.0f);
+    Matrix::frustumM(projectionMatrix, -1, 1, -1, 1, 2, 10);
 
     // view
-    //Matrix::setIdentityM(matrixView);
-    Matrix::setLookAtM(matrixView, 0.0f, 0.0f, 4.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
+    //Matrix::setIdentityM(viewMatrix);
+    Matrix::setLookAtM(viewMatrix, 0.0f, 0.0f, -2.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
 
     // load
     this->loadShader();
@@ -80,7 +89,7 @@ void GLContext::initialize(SDL_Window * window)
     CHECK_GL();
 
     //this->loadMatrix();
-    //logMatrix(matrixMVP, sizeof(matrixMVP)/sizeof(matrixMVP[0]));
+    //logMatrix(mvpMatrix, sizeof(mvpMatrix)/sizeof(mvpMatrix[0]));
 }
 
 
@@ -147,21 +156,33 @@ void GLContext::loadTexture()
 void GLContext::loadMatrix()
 {
     // model
-    Matrix::setIdentityM(matrixModel);
-    Matrix::scaleM(matrixModel, scale_, 1.0f, 1.0f);
-    Matrix::setRotateM(matrixModel, rotateX_, 1.0f, 0.0f, 0.0f);
-    Matrix::setRotateM(matrixModel, rotateY_, 0.0f, 0.0f, 1.0f);
-    //Matrix::translateM(matrixModel, 0.0f, 0.0f, -2.0f);
+    Matrix::setIdentityM(modelMatrix);
+    Matrix::translateM(modelMatrix, 0.0f, 0.0f, 4.0f);
+
+    // rotation
+    Matrix::setRotateM(currentRotationX_, rotateX_, 0.0f, 1.0f, 0.0f);
+    Matrix::setRotateM(currentRotationY_, rotateY_, 1.0f, 0.0f, 0.0f);
+    rotateX_ = rotateY_ = 0.0f;
+
+
+    Matrix::multiplyMM(temporaryMatrix_, currentRotationX_, accumulatedRotation_);
+    memcpy(accumulatedRotation_, temporaryMatrix_, 16 * sizeof(float));
+
+    Matrix::multiplyMM(temporaryMatrix_, currentRotationY_, accumulatedRotation_);
+    memcpy(accumulatedRotation_, temporaryMatrix_, 16 * sizeof(float));
+
+    Matrix::multiplyMM(temporaryMatrix_, modelMatrix, accumulatedRotation_);
+    memcpy(modelMatrix, temporaryMatrix_, 16 * sizeof(float));
 
     // projection * view * model
-    Matrix::multiplyMM(matrixMVP, matrixView, matrixModel);
-    Matrix::multiplyMM(matrixMVP, matrixProjection, matrixMVP);
+    Matrix::multiplyMM(temporaryMatrix_, viewMatrix, modelMatrix);
+    Matrix::multiplyMM(mvpMatrix, projectionMatrix, temporaryMatrix_);
 
-    //Matrix::setIdentityM(matrixMVP);
+    //Matrix::setIdentityM(mvpMatrix);
 
     // mvp
     GLint mvpSlot = glGetUniformLocation(shaderProgram_, "u_mvpmatrix");
-    glUniformMatrix4fv(mvpSlot, 1, 0, matrixMVP);
+    glUniformMatrix4fv(mvpSlot, 1, 0, mvpMatrix);
 }
 
 
@@ -193,7 +214,7 @@ void GLContext::incRotate(float rotateX, float rotateY)
 
 void GLContext::incScale(float scale)
 {
-    scale_ += scale;
-    SDL_Log("scale: %f", scale_);
+    //scale_ += scale;
+    //SDL_Log("scale: %f", scale_);
 }
 

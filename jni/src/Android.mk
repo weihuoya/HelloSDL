@@ -15,6 +15,7 @@ LOCAL_C_INCLUDES := \
 # Add your application source files here...
 LOCAL_SRC_FILES := \
     $(SDL_PATH)/src/main/android/SDL_android_main.c \
+    GLKMath/GLKIdentity.c \
     main.cpp \
     eventhandler.cpp \
     glcontext.cpp \

@@ -40,7 +40,11 @@ private:
 
     float rotateX_;
     float rotateY_;
-    float scale_;
+
+    float * accumulatedRotation_;
+    float * currentRotationX_;
+    float * currentRotationY_;
+    float * temporaryMatrix_;
 };
 
 

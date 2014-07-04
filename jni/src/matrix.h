@@ -8,12 +8,34 @@
 # define M_PI           3.14159265358979323846  /* pi */
 #endif
 
+
+class Quaternion
+{
+public:
+    static void setIdentityM(float q[]);
+    static void setAngleAndAxis(float q[], float radians, float x, float y, float z);
+
+    static void add(float q[], const float lhs[], const float rhs[]);
+    static void Subtract(float q[], const float lhs[], const float rhs[]);
+    static void Multiply(float q[], const float lhs[], const float rhs[]);
+
+    static float length(float q[]);
+
+    static void conjugate(float out_q[], const float in_q[])
+    static void invert(float out_q[], const float in_q[]);
+    static void normalize(float out_q[], const float in_q[]);
+
+    static void rotateVector3();
+    static void rotateVector4();
+};
+
+
 class Matrix
 {
 public:
     static void frustumM(float m[], float left, float right, float bottom, float top, float near, float far);
 
-    static bool invertM(float mInv[], float m[]);
+    static bool invertM(float mInv[], const float m[]);
 
     static float length(float x, float y, float z);
 

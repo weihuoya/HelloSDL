@@ -148,9 +148,9 @@ int EventHandler::OnFingerEvent(const SDL_TouchFingerEvent& event)
     }
     else if(event.type == SDL_FINGERMOTION)
     {
-        float dx = event.dx;
-        float dy = event.dy;
-        GLContext::instance()->incRotate(dx > 0 ? 2.0f : -2.0f, dy > 0 ? 2.0f : -2.0f);
+        float dx = event.dx * 100;
+        float dy = event.dy * 100;
+        GLContext::instance()->incRotate(dx, -dy);
     }
     else if(event.type == SDL_FINGERUP)
     {
@@ -182,7 +182,7 @@ int EventHandler::OnMultiGesture(const SDL_MultiGestureEvent& gesture)
 
         if (prevDistance_ > 0)
         {
-            GLContext::instance()->incScale(currDistance > prevDistance_ ? 0.1f : -0.1f);
+            GLContext::instance()->incScale(currDistance - prevDistance_);
         }
         else
         {
