@@ -145,15 +145,17 @@ int EventHandler::OnFingerEvent(const SDL_TouchFingerEvent& event)
 {
     if(event.type == SDL_FINGERDOWN)
     {
+        SDL_Log("[finger] down");
     }
     else if(event.type == SDL_FINGERMOTION)
     {
         float dx = event.dx * 100;
         float dy = event.dy * 100;
-        GLContext::instance()->incRotate(dx, -dy);
+        GLContext::instance()->incRotate(dx, -dy, 0.0f);
     }
     else if(event.type == SDL_FINGERUP)
     {
+        SDL_Log("[finger] up");
     }
 
     return 0;
@@ -182,7 +184,16 @@ int EventHandler::OnMultiGesture(const SDL_MultiGestureEvent& gesture)
 
         if (prevDistance_ > 0)
         {
-            GLContext::instance()->incScale(currDistance - prevDistance_);
+            float delta = currDistance - prevDistance_;
+            if(delta < 0.1)
+            {
+                GLContext::instance()->incTranslate(0, 0);
+            }
+            else
+            {
+                GLContext::instance()->incScale(1.0);
+            }
+            prevDistance_ = currDistance;
         }
         else
         {

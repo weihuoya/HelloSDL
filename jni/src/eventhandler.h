@@ -10,7 +10,7 @@
 #define __hellosdl__eventhandler__
 
 #include <SDL_events.h>
-#include "utool.h"
+#include "gltool.h"
 //#include <sigc++/sigc++.h>
 
 class EventHandler

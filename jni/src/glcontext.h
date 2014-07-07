@@ -1,8 +1,9 @@
 #ifndef __hellosdl__glcontext__
 #define __hellosdl__glcontext__
 
-#include "utool.h"
+#include "gltool.h"
 #include "glcube.h"
+#include "gltransform.h"
 
 
 class GLContext
@@ -23,28 +24,21 @@ public:
     void flush();
 
     void incRotate(float rotateX, float rotateY);
+    void incTranslate(float x, float y);
     void incScale(float scale);
 
 private:
     DISALLOW_IMPLICIT_CONSTRUCTORS(GLContext);
 
-
     SDL_Window * window_;
     GLCube * cube_;
+    GLTransform * transform_;
 
     SDL_GLContext glcontext_;
     SDL_DisplayMode displayMode_;
 
     GLuint shaderProgram_;
     GLuint textureBuffer_;
-
-    float rotateX_;
-    float rotateY_;
-
-    float * accumulatedRotation_;
-    float * currentRotationX_;
-    float * currentRotationY_;
-    float * temporaryMatrix_;
 };
 
 

@@ -1,7 +1,7 @@
 #ifndef __hellosdl__glcube__
 #define __hellosdl__glcube__
 
-#include "utool.h"
+#include "gltool.h"
 
 
 class GLCube

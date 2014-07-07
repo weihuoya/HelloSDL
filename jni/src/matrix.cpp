@@ -1,13 +1,7 @@
 #include "matrix.h"
-#include <cmath>
 #include <cstring>
 
-#ifndef M_PI
-# define M_PI           3.14159265358979323846  /* pi */
-#endif
 
-
-//float Matrix::sTemp[32];
 static float sTemp[32];
 
 /**
@@ -22,12 +16,8 @@ static float sTemp[32];
  * either the lhs or rhs elements.
  *
  * @param result The float array that holds the result.
- * @param resultOffset The offset into the result array where the result is
- *        stored.
  * @param lhs The float array that holds the left-hand-side matrix.
- * @param lhsOffset The offset into the lhs array where the lhs is stored
  * @param rhs The float array that holds the right-hand-side matrix.
- * @param rhsOffset The offset into the rhs array where the rhs is stored.
  *
  * @throws IllegalArgumentException if result, lhs, or rhs are null, or if
  * resultOffset + 16 > result.length or lhsOffset + 16 > lhs.length or
@@ -66,13 +56,8 @@ void Matrix::multiplyMM(float result[], const float lhs[], const float rhs[])
  * elements overlap either the lhsMat or rhsVec elements.
  *
  * @param resultVec The float array that holds the result vector.
- * @param resultVecOffset The offset into the result array where the result
- *        vector is stored.
  * @param lhsMat The float array that holds the left-hand-side matrix.
- * @param lhsMatOffset The offset into the lhs array where the lhs is stored
  * @param rhsVec The float array that holds the right-hand-side vector.
- * @param rhsVecOffset The offset into the rhs vector where the rhs vector
- *        is stored.
  *
  * @throws IllegalArgumentException if resultVec, lhsMat,
  * or rhsVec are null, or if resultVecOffset + 4 > resultVec.length
@@ -80,7 +65,8 @@ void Matrix::multiplyMM(float result[], const float lhs[], const float rhs[])
  * rhsVecOffset + 4 > rhsVec.length.
  */
 static inline
-void mx4transform(float x, float y, float z, float w, const float* pM, float* pDest) {
+void mx4transform(float x, float y, float z, float w, const float* pM, float* pDest)
+{
     pDest[0] = pM[0 + 4 * 0] * x + pM[0 + 4 * 1] * y + pM[0 + 4 * 2] * z + pM[0 + 4 * 3] * w;
     pDest[1] = pM[1 + 4 * 0] * x + pM[1 + 4 * 1] * y + pM[1 + 4 * 2] * z + pM[1 + 4 * 3] * w;
     pDest[2] = pM[2 + 4 * 0] * x + pM[2 + 4 * 1] * y + pM[2 + 4 * 2] * z + pM[2 + 4 * 3] * w;
@@ -98,12 +84,10 @@ void Matrix::multiplyMV(float resultVec[], const float lhsMat[], const float rhs
  * mTrans and m must not overlap.
  *
  * @param mTrans the array that holds the output transposed matrix
- * @param mTransOffset an offset into mTrans where the transposed matrix is
- *        stored.
  * @param m the input array
- * @param mOffset an offset into m where the input matrix is stored.
  */
-void Matrix::transposeM(float mTrans[], const float m[]) {
+void Matrix::transposeM(float mTrans[], const float m[])
+{
     for (int i = 0; i < 4; i++) {
         int mBase = i * 4;
         mTrans[i +  0] = m[mBase + 0];
@@ -120,37 +104,33 @@ void Matrix::transposeM(float mTrans[], const float m[]) {
  * mInv and m must not overlap.
  *
  * @param mInv the array that holds the output inverted matrix
- * @param mInvOffset an offset into mInv where the inverted matrix is
- *        stored.
  * @param m the input array
- * @param mOffset an offset into m where the input matrix is stored.
  * @return true if the matrix could be inverted, false if it could not.
  */
-bool Matrix::invertM(float mInv[], float m[]) {
-    const int mInvOffset = 0;
-    const int mOffset = 0;
+bool Matrix::invertM(float mInv[], const float m[])
+{
     // Invert a 4 x 4 matrix using Cramer's Rule
 
     // transpose matrix
-    const float src0  = m[mOffset +  0];
-    const float src4  = m[mOffset +  1];
-    const float src8  = m[mOffset +  2];
-    const float src12 = m[mOffset +  3];
+    const float src0  = m[ 0];
+    const float src4  = m[ 1];
+    const float src8  = m[ 2];
+    const float src12 = m[ 3];
 
-    const float src1  = m[mOffset +  4];
-    const float src5  = m[mOffset +  5];
-    const float src9  = m[mOffset +  6];
-    const float src13 = m[mOffset +  7];
+    const float src1  = m[ 4];
+    const float src5  = m[ 5];
+    const float src9  = m[ 6];
+    const float src13 = m[ 7];
 
-    const float src2  = m[mOffset +  8];
-    const float src6  = m[mOffset +  9];
-    const float src10 = m[mOffset + 10];
-    const float src14 = m[mOffset + 11];
+    const float src2  = m[ 8];
+    const float src6  = m[ 9];
+    const float src10 = m[10];
+    const float src14 = m[11];
 
-    const float src3  = m[mOffset + 12];
-    const float src7  = m[mOffset + 13];
-    const float src11 = m[mOffset + 14];
-    const float src15 = m[mOffset + 15];
+    const float src3  = m[12];
+    const float src7  = m[13];
+    const float src11 = m[14];
+    const float src15 = m[15];
 
     // calculate pairs for first 8 elements (cofactors)
     const float atmp0  = src10 * src15;
@@ -226,25 +206,25 @@ bool Matrix::invertM(float mInv[], float m[]) {
 
     // calculate matrix inverse
     const float invdet = 1.0f / det;
-    mInv[ 0 + mInvOffset] = dst0  * invdet;
-    mInv[ 1 + mInvOffset] = dst1  * invdet;
-    mInv[ 2 + mInvOffset] = dst2  * invdet;
-    mInv[ 3 + mInvOffset] = dst3  * invdet;
+    mInv[ 0] = dst0  * invdet;
+    mInv[ 1] = dst1  * invdet;
+    mInv[ 2] = dst2  * invdet;
+    mInv[ 3] = dst3  * invdet;
 
-    mInv[ 4 + mInvOffset] = dst4  * invdet;
-    mInv[ 5 + mInvOffset] = dst5  * invdet;
-    mInv[ 6 + mInvOffset] = dst6  * invdet;
-    mInv[ 7 + mInvOffset] = dst7  * invdet;
+    mInv[ 4] = dst4  * invdet;
+    mInv[ 5] = dst5  * invdet;
+    mInv[ 6] = dst6  * invdet;
+    mInv[ 7] = dst7  * invdet;
 
-    mInv[ 8 + mInvOffset] = dst8  * invdet;
-    mInv[ 9 + mInvOffset] = dst9  * invdet;
-    mInv[10 + mInvOffset] = dst10 * invdet;
-    mInv[11 + mInvOffset] = dst11 * invdet;
+    mInv[ 8] = dst8  * invdet;
+    mInv[ 9] = dst9  * invdet;
+    mInv[10] = dst10 * invdet;
+    mInv[11] = dst11 * invdet;
 
-    mInv[12 + mInvOffset] = dst12 * invdet;
-    mInv[13 + mInvOffset] = dst13 * invdet;
-    mInv[14 + mInvOffset] = dst14 * invdet;
-    mInv[15 + mInvOffset] = dst15 * invdet;
+    mInv[12] = dst12 * invdet;
+    mInv[13] = dst13 * invdet;
+    mInv[14] = dst14 * invdet;
+    mInv[15] = dst15 * invdet;
 
     return true;
 }
@@ -254,7 +234,6 @@ bool Matrix::invertM(float mInv[], float m[]) {
  * Computes an orthographic projection matrix.
  *
  * @param m returns the result
- * @param mOffset
  * @param left
  * @param right
  * @param bottom
@@ -262,9 +241,8 @@ bool Matrix::invertM(float mInv[], float m[]) {
  * @param near
  * @param far
  */
-void Matrix::orthoM(float m[], float left, float right, float bottom, float top, float near, float far) {
-    const int mOffset = 0;
-
+void Matrix::orthoM(float m[], float left, float right, float bottom, float top, float near, float far)
+{
     if (left == right) {
         //throw new IllegalArgumentException("left == right");
         return;
@@ -287,22 +265,22 @@ void Matrix::orthoM(float m[], float left, float right, float bottom, float top,
     const float tx = -(right + left) * r_width;
     const float ty = -(top + bottom) * r_height;
     const float tz = -(far + near) * r_depth;
-    m[mOffset + 0] = x;
-    m[mOffset + 5] = y;
-    m[mOffset +10] = z;
-    m[mOffset +12] = tx;
-    m[mOffset +13] = ty;
-    m[mOffset +14] = tz;
-    m[mOffset +15] = 1.0f;
-    m[mOffset + 1] = 0.0f;
-    m[mOffset + 2] = 0.0f;
-    m[mOffset + 3] = 0.0f;
-    m[mOffset + 4] = 0.0f;
-    m[mOffset + 6] = 0.0f;
-    m[mOffset + 7] = 0.0f;
-    m[mOffset + 8] = 0.0f;
-    m[mOffset + 9] = 0.0f;
-    m[mOffset + 11] = 0.0f;
+    m[ 0] = x;
+    m[ 5] = y;
+    m[10] = z;
+    m[12] = tx;
+    m[13] = ty;
+    m[14] = tz;
+    m[15] = 1.0f;
+    m[ 1] = 0.0f;
+    m[ 2] = 0.0f;
+    m[ 3] = 0.0f;
+    m[ 4] = 0.0f;
+    m[ 6] = 0.0f;
+    m[ 7] = 0.0f;
+    m[ 8] = 0.0f;
+    m[ 9] = 0.0f;
+    m[11] = 0.0f;
 }
 
 
@@ -310,8 +288,6 @@ void Matrix::orthoM(float m[], float left, float right, float bottom, float top,
  * Defines a projection matrix in terms of six clip planes.
  *
  * @param m the float array that holds the output perspective matrix
- * @param offset the offset into float array m where the perspective
- *        matrix data is written
  * @param left
  * @param right
  * @param bottom
@@ -319,7 +295,8 @@ void Matrix::orthoM(float m[], float left, float right, float bottom, float top,
  * @param near
  * @param far
  */
-void Matrix::frustumM(float m[], float left, float right, float bottom, float top, float near, float far) {
+void Matrix::frustumM(float m[], float left, float right, float bottom, float top, float near, float far)
+{
     if (left == right) {
         //throw new IllegalArgumentException("left == right");
         return;
@@ -340,7 +317,6 @@ void Matrix::frustumM(float m[], float left, float right, float bottom, float to
         //throw new IllegalArgumentException("far <= 0.0f");
         return;
     }
-    const int offset = 0;
     const float r_width  = 1.0f / (right - left);
     const float r_height = 1.0f / (top - bottom);
     const float r_depth  = 1.0f / (near - far);
@@ -350,22 +326,22 @@ void Matrix::frustumM(float m[], float left, float right, float bottom, float to
     const float B = (top + bottom) * r_height;
     const float C = (far + near) * r_depth;
     const float D = 2.0f * (far * near * r_depth);
-    m[offset + 0] = x;
-    m[offset + 5] = y;
-    m[offset + 8] = A;
-    m[offset +  9] = B;
-    m[offset + 10] = C;
-    m[offset + 14] = D;
-    m[offset + 11] = -1.0f;
-    m[offset +  1] = 0.0f;
-    m[offset +  2] = 0.0f;
-    m[offset +  3] = 0.0f;
-    m[offset +  4] = 0.0f;
-    m[offset +  6] = 0.0f;
-    m[offset +  7] = 0.0f;
-    m[offset + 12] = 0.0f;
-    m[offset + 13] = 0.0f;
-    m[offset + 15] = 0.0f;
+    m[ 0] = x;
+    m[ 5] = y;
+    m[ 8] = A;
+    m[ 9] = B;
+    m[10] = C;
+    m[14] = D;
+    m[11] = -1.0f;
+    m[ 1] = 0.0f;
+    m[ 2] = 0.0f;
+    m[ 3] = 0.0f;
+    m[ 4] = 0.0f;
+    m[ 6] = 0.0f;
+    m[ 7] = 0.0f;
+    m[12] = 0.0f;
+    m[13] = 0.0f;
+    m[15] = 0.0f;
 }
 
 /**
@@ -373,38 +349,35 @@ void Matrix::frustumM(float m[], float left, float right, float bottom, float to
  * aspect ratio, and z clip planes.
  *
  * @param m the float array that holds the perspective matrix
- * @param offset the offset into float array m where the perspective
- *        matrix data is written
  * @param fovy field of view in y direction, in degrees
  * @param aspect width to height aspect ratio of the viewport
  * @param zNear
  * @param zFar
  */
-void Matrix::perspectiveM(float m[], float fovy, float aspect, float zNear, float zFar) {
-    const int offset = 0;
-
+void Matrix::perspectiveM(float m[], float fovy, float aspect, float zNear, float zFar)
+{
     float f = 1.0f / (float) tan(fovy * (M_PI / 360.0));
     float rangeReciprocal = 1.0f / (zNear - zFar);
 
-    m[offset + 0] = f / aspect;
-    m[offset + 1] = 0.0f;
-    m[offset + 2] = 0.0f;
-    m[offset + 3] = 0.0f;
+    m[ 0] = f / aspect;
+    m[ 1] = 0.0f;
+    m[ 2] = 0.0f;
+    m[ 3] = 0.0f;
 
-    m[offset + 4] = 0.0f;
-    m[offset + 5] = f;
-    m[offset + 6] = 0.0f;
-    m[offset + 7] = 0.0f;
+    m[ 4] = 0.0f;
+    m[ 5] = f;
+    m[ 6] = 0.0f;
+    m[ 7] = 0.0f;
 
-    m[offset + 8] = 0.0f;
-    m[offset + 9] = 0.0f;
-    m[offset + 10] = (zFar + zNear) * rangeReciprocal;
-    m[offset + 11] = -1.0f;
+    m[ 8] = 0.0f;
+    m[ 9] = 0.0f;
+    m[10] = (zFar + zNear) * rangeReciprocal;
+    m[11] = -1.0f;
 
-    m[offset + 12] = 0.0f;
-    m[offset + 13] = 0.0f;
-    m[offset + 14] = 2.0f * zFar * zNear * rangeReciprocal;
-    m[offset + 15] = 0.0f;
+    m[12] = 0.0f;
+    m[13] = 0.0f;
+    m[14] = 2.0f * zFar * zNear * rangeReciprocal;
+    m[15] = 0.0f;
 }
 
 /**
@@ -415,7 +388,8 @@ void Matrix::perspectiveM(float m[], float fovy, float aspect, float zNear, floa
  * @param z z coordinate of a vector
  * @return the length of a vector
  */
-float Matrix::length(float x, float y, float z) {
+float Matrix::length(float x, float y, float z)
+{
     return (float) sqrt(x * x + y * y + z * z);
 }
 
@@ -423,9 +397,9 @@ float Matrix::length(float x, float y, float z) {
  * Sets matrix m to the identity matrix.
  *
  * @param sm returns the result
- * @param smOffset index into sm where the result matrix starts
  */
-void Matrix::setIdentityM(float sm[]) {
+void Matrix::setIdentityM(float sm[])
+{
     int i;
 
     for (i=0 ; i<16 ; i++) {
@@ -443,14 +417,13 @@ void Matrix::setIdentityM(float sm[]) {
  * m and sm must not overlap.
  *
  * @param sm returns the result
- * @param smOffset index into sm where the result matrix starts
  * @param m source matrix
- * @param mOffset index into m where the source matrix starts
  * @param x scale factor x
  * @param y scale factor y
  * @param z scale factor z
  */
-void Matrix::scaleM(float sm[], const float m[], float x, float y, float z) {
+void Matrix::scaleM(float sm[], const float m[], float x, float y, float z)
+{
     for (int i=0 ; i<4 ; i++) {
         sm[     i] = m[     i] * x;
         sm[ 4 + i] = m[ 4 + i] * y;
@@ -463,12 +436,12 @@ void Matrix::scaleM(float sm[], const float m[], float x, float y, float z) {
  * Scales matrix m in place by sx, sy, and sz.
  *
  * @param m matrix to scale
- * @param mOffset index into m where the matrix starts
  * @param x scale factor x
  * @param y scale factor y
  * @param z scale factor z
  */
-void Matrix::scaleM(float m[], float x, float y, float z) {
+void Matrix::scaleM(float m[], float x, float y, float z)
+{
     for (int i=0 ; i<4 ; i++) {
         m[     i] *= x;
         m[ 4 + i] *= y;
@@ -482,14 +455,13 @@ void Matrix::scaleM(float m[], float x, float y, float z) {
  * m and tm must not overlap.
  *
  * @param tm returns the result
- * @param tmOffset index into sm where the result matrix starts
  * @param m source matrix
- * @param mOffset index into m where the source matrix starts
  * @param x translation factor x
  * @param y translation factor y
  * @param z translation factor z
  */
-void Matrix::translateM(float tm[], const float m[], float x, float y, float z) {
+void Matrix::translateM(float tm[], const float m[], float x, float y, float z)
+{
     for (int i=0 ; i<12 ; i++) {
         tm[i] = m[i];
     }
@@ -503,12 +475,12 @@ void Matrix::translateM(float tm[], const float m[], float x, float y, float z) 
  * Translates matrix m by x, y, and z in place.
  *
  * @param m matrix
- * @param mOffset index into m where the matrix starts
  * @param x translation factor x
  * @param y translation factor y
  * @param z translation factor z
  */
-void Matrix::translateM(float m[], float x, float y, float z) {
+void Matrix::translateM(float m[], float x, float y, float z)
+{
     for (int i=0 ; i<4 ; i++) {
         m[12 + i] += m[i] * x + m[4 + i] * y + m[8 + i] * z;
     }
@@ -520,15 +492,14 @@ void Matrix::translateM(float m[], float x, float y, float z) {
  * m and rm must not overlap.
  *
  * @param rm returns the result
- * @param rmOffset index into rm where the result matrix starts
  * @param m source matrix
- * @param mOffset index into m where the source matrix starts
  * @param a angle to rotate in degrees
  * @param x X axis component
  * @param y Y axis component
  * @param z Z axis component
  */
-void Matrix::rotateM(float rm[], const float m[], float a, float x, float y, float z) {
+void Matrix::rotateM(float rm[], const float m[], float a, float x, float y, float z)
+{
     Matrix::setRotateM(sTemp, a, x, y, z);
     Matrix::multiplyMM(rm, m, sTemp);
 }
@@ -538,13 +509,13 @@ void Matrix::rotateM(float rm[], const float m[], float a, float x, float y, flo
  * around the axis (x, y, z).
  *
  * @param m source matrix
- * @param mOffset index into m where the matrix starts
  * @param a angle to rotate in degrees
  * @param x X axis component
  * @param y Y axis component
  * @param z Z axis component
  */
-void Matrix::rotateM(float m[], float a, float x, float y, float z) {
+void Matrix::rotateM(float m[], float a, float x, float y, float z)
+{
     Matrix::setRotateM(sTemp, a, x, y, z);
     Matrix::multiplyMM(sTemp+16, m, sTemp);
     memcpy(m, sTemp+16, 16);
@@ -558,43 +529,41 @@ void Matrix::rotateM(float m[], float a, float x, float y, float z) {
  * (e.g. x=1.0f y=0.0f z=0.0f).
  *
  * @param rm returns the result
- * @param rmOffset index into rm where the result matrix starts
  * @param a angle to rotate in degrees
  * @param x X axis component
  * @param y Y axis component
  * @param z Z axis component
  */
-void Matrix::setRotateM(float rm[], float a, float x, float y, float z) {
-    const int rmOffset = 0;
-
-    rm[rmOffset + 3] = 0;
-    rm[rmOffset + 7] = 0;
-    rm[rmOffset + 11]= 0;
-    rm[rmOffset + 12]= 0;
-    rm[rmOffset + 13]= 0;
-    rm[rmOffset + 14]= 0;
-    rm[rmOffset + 15]= 1;
+void Matrix::setRotateM(float rm[], float a, float x, float y, float z)
+{
+    rm[ 3] = 0;
+    rm[ 7] = 0;
+    rm[11]= 0;
+    rm[12]= 0;
+    rm[13]= 0;
+    rm[14]= 0;
+    rm[15]= 1;
     a *= (float) (M_PI / 180.0f);
     float s = (float) sin(a);
     float c = (float) cos(a);
     if (1.0f == x && 0.0f == y && 0.0f == z) {
-        rm[rmOffset + 5] = c;   rm[rmOffset + 10]= c;
-        rm[rmOffset + 6] = s;   rm[rmOffset + 9] = -s;
-        rm[rmOffset + 1] = 0;   rm[rmOffset + 2] = 0;
-        rm[rmOffset + 4] = 0;   rm[rmOffset + 8] = 0;
-        rm[rmOffset + 0] = 1;
+        rm[ 5] = c;   rm[10]= c;
+        rm[ 6] = s;   rm[ 9] = -s;
+        rm[ 1] = 0;   rm[ 2] = 0;
+        rm[ 4] = 0;   rm[ 8] = 0;
+        rm[ 0] = 1;
     } else if (0.0f == x && 1.0f == y && 0.0f == z) {
-        rm[rmOffset + 0] = c;   rm[rmOffset + 10]= c;
-        rm[rmOffset + 8] = s;   rm[rmOffset + 2] = -s;
-        rm[rmOffset + 1] = 0;   rm[rmOffset + 4] = 0;
-        rm[rmOffset + 6] = 0;   rm[rmOffset + 9] = 0;
-        rm[rmOffset + 5] = 1;
+        rm[ 0] = c;   rm[10]= c;
+        rm[ 8] = s;   rm[ 2] = -s;
+        rm[ 1] = 0;   rm[ 4] = 0;
+        rm[ 6] = 0;   rm[ 9] = 0;
+        rm[ 5] = 1;
     } else if (0.0f == x && 0.0f == y && 1.0f == z) {
-        rm[rmOffset + 0] = c;   rm[rmOffset + 5] = c;
-        rm[rmOffset + 1] = s;   rm[rmOffset + 4] = -s;
-        rm[rmOffset + 2] = 0;   rm[rmOffset + 6] = 0;
-        rm[rmOffset + 8] = 0;   rm[rmOffset + 9] = 0;
-        rm[rmOffset + 10]= 1;
+        rm[ 0] = c;   rm[ 5] = c;
+        rm[ 1] = s;   rm[ 4] = -s;
+        rm[ 2] = 0;   rm[ 6] = 0;
+        rm[ 8] = 0;   rm[ 9] = 0;
+        rm[10]= 1;
     } else {
         float len = length(x, y, z);
         if (1.0f != len) {
@@ -610,15 +579,15 @@ void Matrix::setRotateM(float rm[], float a, float x, float y, float z) {
         float xs = x * s;
         float ys = y * s;
         float zs = z * s;
-        rm[rmOffset +  0] = x*x*nc +  c;
-        rm[rmOffset +  4] =  xy*nc - zs;
-        rm[rmOffset +  8] =  zx*nc + ys;
-        rm[rmOffset +  1] =  xy*nc + zs;
-        rm[rmOffset +  5] = y*y*nc +  c;
-        rm[rmOffset +  9] =  yz*nc - xs;
-        rm[rmOffset +  2] =  zx*nc - ys;
-        rm[rmOffset +  6] =  yz*nc + xs;
-        rm[rmOffset + 10] = z*z*nc +  c;
+        rm[ 0] = x*x*nc +  c;
+        rm[ 4] =  xy*nc - zs;
+        rm[ 8] =  zx*nc + ys;
+        rm[ 1] =  xy*nc + zs;
+        rm[ 5] = y*y*nc +  c;
+        rm[ 9] =  yz*nc - xs;
+        rm[ 2] =  zx*nc - ys;
+        rm[ 6] =  yz*nc + xs;
+        rm[10] = z*z*nc +  c;
     }
 }
 
@@ -626,14 +595,12 @@ void Matrix::setRotateM(float rm[], float a, float x, float y, float z) {
  * Converts Euler angles to a rotation matrix.
  *
  * @param rm returns the result
- * @param rmOffset index into rm where the result matrix starts
  * @param x angle of rotation, in degrees
  * @param y angle of rotation, in degrees
  * @param z angle of rotation, in degrees
  */
-void Matrix::setRotateEulerM(float rm[], float x, float y, float z) {
-    const int rmOffset = 0;
-
+void Matrix::setRotateEulerM(float rm[], float x, float y, float z)
+{
     x *= (float) (M_PI / 180.0f);
     y *= (float) (M_PI / 180.0f);
     z *= (float) (M_PI / 180.0f);
@@ -646,25 +613,25 @@ void Matrix::setRotateEulerM(float rm[], float x, float y, float z) {
     float cxsy = cx * sy;
     float sxsy = sx * sy;
 
-    rm[rmOffset + 0]  =   cy * cz;
-    rm[rmOffset + 1]  =  -cy * sz;
-    rm[rmOffset + 2]  =   sy;
-    rm[rmOffset + 3]  =  0.0f;
+    rm[ 0]  =   cy * cz;
+    rm[ 1]  =  -cy * sz;
+    rm[ 2]  =   sy;
+    rm[ 3]  =  0.0f;
 
-    rm[rmOffset + 4]  =  cxsy * cz + cx * sz;
-    rm[rmOffset + 5]  = -cxsy * sz + cx * cz;
-    rm[rmOffset + 6]  =  -sx * cy;
-    rm[rmOffset + 7]  =  0.0f;
+    rm[ 4]  =  cxsy * cz + cx * sz;
+    rm[ 5]  = -cxsy * sz + cx * cz;
+    rm[ 6]  =  -sx * cy;
+    rm[ 7]  =  0.0f;
 
-    rm[rmOffset + 8]  = -sxsy * cz + sx * sz;
-    rm[rmOffset + 9]  =  sxsy * sz + sx * cz;
-    rm[rmOffset + 10] =  cx * cy;
-    rm[rmOffset + 11] =  0.0f;
+    rm[ 8]  = -sxsy * cz + sx * sz;
+    rm[ 9]  =  sxsy * sz + sx * cz;
+    rm[10] =  cx * cy;
+    rm[11] =  0.0f;
 
-    rm[rmOffset + 12] =  0.0f;
-    rm[rmOffset + 13] =  0.0f;
-    rm[rmOffset + 14] =  0.0f;
-    rm[rmOffset + 15] =  1.0f;
+    rm[12] =  0.0f;
+    rm[13] =  0.0f;
+    rm[14] =  0.0f;
+    rm[15] =  1.0f;
 }
 
 /**
@@ -672,7 +639,6 @@ void Matrix::setRotateEulerM(float rm[], float x, float y, float z) {
  * view, and an up vector.
  *
  * @param rm returns the result
- * @param rmOffset index into rm where the result matrix starts
  * @param eyeX eye point X
  * @param eyeY eye point Y
  * @param eyeZ eye point Z
@@ -688,8 +654,6 @@ void Matrix::setLookAtM(float rm[],
         float centerX, float centerY, float centerZ,
         float upX, float upY, float upZ)
 {
-    const int rmOffset = 0;
-
     // See the OpenGL GLUT documentation for gluLookAt for a description
     // of the algorithm. We implement it in a straightforward way:
 
@@ -719,25 +683,25 @@ void Matrix::setLookAtM(float rm[],
     float uy = sz * fx - sx * fz;
     float uz = sx * fy - sy * fx;
 
-    rm[rmOffset + 0] = sx;
-    rm[rmOffset + 1] = ux;
-    rm[rmOffset + 2] = -fx;
-    rm[rmOffset + 3] = 0.0f;
+    rm[ 0] = sx;
+    rm[ 1] = ux;
+    rm[ 2] = -fx;
+    rm[ 3] = 0.0f;
 
-    rm[rmOffset + 4] = sy;
-    rm[rmOffset + 5] = uy;
-    rm[rmOffset + 6] = -fy;
-    rm[rmOffset + 7] = 0.0f;
+    rm[ 4] = sy;
+    rm[ 5] = uy;
+    rm[ 6] = -fy;
+    rm[ 7] = 0.0f;
 
-    rm[rmOffset + 8] = sz;
-    rm[rmOffset + 9] = uz;
-    rm[rmOffset + 10] = -fz;
-    rm[rmOffset + 11] = 0.0f;
+    rm[ 8] = sz;
+    rm[ 9] = uz;
+    rm[10] = -fz;
+    rm[11] = 0.0f;
 
-    rm[rmOffset + 12] = 0.0f;
-    rm[rmOffset + 13] = 0.0f;
-    rm[rmOffset + 14] = 0.0f;
-    rm[rmOffset + 15] = 1.0f;
+    rm[12] = 0.0f;
+    rm[13] = 0.0f;
+    rm[14] = 0.0f;
+    rm[15] = 1.0f;
 
     Matrix::translateM(rm, -eyeX, -eyeY, -eyeZ);
 }

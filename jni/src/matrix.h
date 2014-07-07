@@ -1,4 +1,3 @@
-
 #ifndef __hellosdl__matrix__
 #define __hellosdl__matrix__
 
@@ -7,27 +6,6 @@
 #ifndef M_PI
 # define M_PI           3.14159265358979323846  /* pi */
 #endif
-
-
-class Quaternion
-{
-public:
-    static void setIdentityM(float q[]);
-    static void setAngleAndAxis(float q[], float radians, float x, float y, float z);
-
-    static void add(float q[], const float lhs[], const float rhs[]);
-    static void Subtract(float q[], const float lhs[], const float rhs[]);
-    static void Multiply(float q[], const float lhs[], const float rhs[]);
-
-    static float length(float q[]);
-
-    static void conjugate(float out_q[], const float in_q[])
-    static void invert(float out_q[], const float in_q[]);
-    static void normalize(float out_q[], const float in_q[]);
-
-    static void rotateVector3();
-    static void rotateVector4();
-};
 
 
 class Matrix

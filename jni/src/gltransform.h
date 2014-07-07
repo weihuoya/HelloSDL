@@ -2,21 +2,19 @@
 #define __hellosdl__gltransform__
 
 
-#include "utool.h"
-#include "GLKMath/GLKMath.h"
-
-
 class GLTransform
 {
 public:
     GLTransform();
     ~GLTransform();
 
-    void scale(float s);
-    void translate(GLVector2 t, float m);
-    void rotate(GLVector3 r, float m);
+    void start();
 
-    void getModelViewMatrix(GLKMatrix4& modelViewMatrix);
+    void scale(float s);
+    void translate(float x, float y);
+    void rotate(float x, float y, float z);
+
+    void getModelViewMatrix(float modelViewMatrix[]);
 
 private:
     //z-depth
@@ -27,12 +25,12 @@ private:
     float scaleEnd_;
 
     //translation
-    GLKVector2 translationStart_;
-    GLKVector2 translationEnd_;
+    float translationStart_[2];
+    float translationEnd_[2];
 
     //rotation
-    GLKVector3 rotationStart_;
-    GLKQuaternion rotationEnd_;
+    float rotationStart_[3];
+    float rotationEnd_[4];
 };
 
 
