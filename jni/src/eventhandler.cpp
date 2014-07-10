@@ -12,21 +12,14 @@
 #include "eventhandler.h"
 #include "glcontext.h"
 
+#include "SDL_events_c.h"
+#include "SDL_touch_c.h"
 
-static int SDL_PostEvent(SDL_EventType eventType)
-{
-    int posted = 0;
-    if (SDL_EventState(eventType, SDL_QUERY) == SDL_ENABLE) {
-        SDL_Event event;
-        event.type = eventType;
-        posted = (SDL_PushEvent(&event) > 0);
-    }
-    return (posted);
-}
 
 EventHandler::EventHandler() : touchId_(0), prevDistance_(0.0f)
 {
 }
+
 
 EventHandler * EventHandler::instance()
 {
@@ -34,13 +27,13 @@ EventHandler * EventHandler::instance()
     return &handler;
 }
 
+
 int EventHandler::OnEventReceived(const SDL_Event& event)
 {
     int done = 0;
 
     switch(event.type) {
         case SDL_WINDOWEVENT:
-            //event.window
             OnWindowEvent(event.window);
             break;
         case SDL_APP_WILLENTERBACKGROUND:
@@ -51,23 +44,17 @@ int EventHandler::OnEventReceived(const SDL_Event& event)
             break;
         case SDL_KEYUP:
         case SDL_KEYDOWN:
-            //event.key
             OnKeyEvent(event.key);
             break;
-        /*case SDL_MOUSEMOTION:
-            OnMouseMotion(event.motion);
-            break;
+        case SDL_MOUSEMOTION:
         case SDL_MOUSEBUTTONDOWN:
         case SDL_MOUSEBUTTONUP:
-            OnMouseButton(event.button);
-            break;*/
+            OnMouseEvent(event);
+            break;
         case SDL_FINGERDOWN:
         case SDL_FINGERMOTION:
         case SDL_FINGERUP:
-            if (SDL_GetNumTouchFingers(event.tfinger.touchId) == 1)
-            {
-                OnFingerEvent(event.tfinger);
-            }
+            OnFingerEvent(event.tfinger);
             break;
         case SDL_MULTIGESTURE:
             OnMultiGesture(event.mgesture);
@@ -84,6 +71,7 @@ int EventHandler::OnEventReceived(const SDL_Event& event)
 
     return done;
 }
+
 
 int EventHandler::OnWindowEvent(const SDL_WindowEvent& window)
 {
@@ -106,6 +94,7 @@ int EventHandler::OnWindowEvent(const SDL_WindowEvent& window)
     return 0;
 }
 
+
 int EventHandler::OnKeyEvent(const SDL_KeyboardEvent& key)
 {
     if(key.type == SDL_KEYDOWN)
@@ -115,25 +104,11 @@ int EventHandler::OnKeyEvent(const SDL_KeyboardEvent& key)
 
     if (key.keysym.sym == 1073742094)
     {
-        SDL_PostEvent(SDL_QUIT);
+        SDL_SendQuit();
     }
     return 0;
 }
 
-int EventHandler::OnMouseButton(const SDL_MouseButtonEvent& mouse)
-{
-    if(mouse.type == SDL_MOUSEBUTTONDOWN)
-    {
-        SDL_Log("[mouse] x: %d, y: %d", mouse.x, mouse.y);
-    }
-    return 0;
-}
-
-int EventHandler::OnMouseMotion(const SDL_MouseMotionEvent& mouse)
-{
-    SDL_Log("[motion] x: %d, y: %d, xrel: %d, yrel: %d", mouse.x, mouse.y, mouse.xrel, mouse.yrel);
-    return 0;
-}
 
 int EventHandler::OnDollarGesture(const SDL_DollarGestureEvent& gesture)
 {
@@ -141,29 +116,67 @@ int EventHandler::OnDollarGesture(const SDL_DollarGestureEvent& gesture)
     return 0;
 }
 
-int EventHandler::OnFingerEvent(const SDL_TouchFingerEvent& event)
+
+int EventHandler::OnMouseEvent(const SDL_Event& event)
 {
-    if(event.type == SDL_FINGERDOWN)
+    /*const SDL_MouseButtonEvent& button = event.button;
+    const SDL_MouseMotionEvent& motion = event.motion;
+
+    if(event.type == SDL_MOUSEBUTTONDOWN)
     {
-        SDL_Log("[finger] down");
+        SDL_Log("[mouse] down");
     }
-    else if(event.type == SDL_FINGERMOTION)
+    else if(event.type == SDL_MOUSEMOTION)
     {
-        float dx = event.dx * 100;
-        float dy = event.dy * 100;
-        GLContext::instance()->incRotate(dx, -dy, 0.0f);
+        SDL_Log("[mouse] motion");
     }
-    else if(event.type == SDL_FINGERUP)
+    else if(event.type == SDL_MOUSEBUTTONUP)
     {
-        SDL_Log("[finger] up");
-    }
+        SDL_Log("[mouse] up");
+    }*/
 
     return 0;
 }
 
+
+int EventHandler::OnFingerEvent(const SDL_TouchFingerEvent& event)
+{
+    Uint32 timestamp = event.timestamp;
+    SDL_TouchID touchId = event.touchId;
+    SDL_FingerID fingerId = event.fingerId;
+
+    int i = 0;
+    const SDL_Finger *finger = NULL;
+    const SDL_Touch * touch = SDL_GetTouch(touchId);
+    if(touch)
+    {
+        for(i = 0; i < touch->num_fingers; ++i)
+        {
+            finger = touch->fingers[i];
+        }
+        SDL_Log("[finger] (%lld, %d)", touch->id, touch->num_fingers, touch->fingers);
+    }
+
+    /*if(event.type == SDL_FINGERDOWN)
+    {
+        SDL_Log("[finger] (%lld, %lld, %u) down", touchId, fingerId, timestamp);
+    }
+    else if(event.type == SDL_FINGERMOTION)
+    {
+        SDL_Log("[finger] (%lld, %lld, %u) motion", touchId, fingerId, timestamp);
+    }
+    else if(event.type == SDL_FINGERUP)
+    {
+        SDL_Log("[finger] (%lld, %lld, %u) up", touchId, fingerId, timestamp);
+    }*/
+
+    return 0;
+}
+
+
 int EventHandler::OnMultiGesture(const SDL_MultiGestureEvent& gesture)
 {
-    const SDL_Finger *finger = NULL;
+    /*const SDL_Finger *finger = NULL;
     SDL_TouchID touchId = gesture.touchId;
     int i = 0, numFingers = SDL_GetNumTouchFingers(touchId);
 
@@ -199,20 +212,23 @@ int EventHandler::OnMultiGesture(const SDL_MultiGestureEvent& gesture)
         {
             prevDistance_ = currDistance;
         }
-    }
+    }*/
 
     return 0;
 }
+
 
 void EventHandler::OnPause()
 {
     SDL_Log("[pause]");
 }
 
+
 void EventHandler::OnResume()
 {
     SDL_Log("[resume]");
 }
+
 
 int EventHandler::OnQuit()
 {

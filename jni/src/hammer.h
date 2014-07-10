@@ -1,69 +1,96 @@
 
 
-struct Pointer
-{
+enum INPUT_DIRECTION {
+    DIRECTION_NONE,
+    DIRECTION_UP,
+    DIRECTION_RIGHT,
+    DIRECTION_DOWN,
+    DIRECTION_LEFT,
+    DIRECTION_HORIZONTAL,
+    DIRECTION_VERTICAL,
+    DIRECTION_ALL,
 };
 
 
-struct InputData
-{
-    uint32_t timeStamp;
-    std::vector<struct{float clientX; float clientY;}> pointers;
-
-    float centerX;
-    float centerY;
-
-    float deltaX;
-    float deltaY;
+enum INPUT_TYPE {
+    INPUT_START,
+    INPUT_MOVE,
+    INPUT_END,
+    INPUT_CANCEL,
 };
 
 
-class Input
+enum RECOGNIZE_STATE {
+    STATE_POSSIBLE,
+    STATE_BEGAN,
+    STATE_CHANGED,
+    STATE_ENDED,
+    STATE_RECOGNIZED,
+    STATE_CANCELLED,
+    STATE_FAILED,
+};
+
+
+
+struct Input
 {
-public:
-    enum DIRECTION {
-        TOP,
-        RIGHT,
-        BOTTOM,
-        LEFT,
-    };
-
-    void inputHandler(manager, eventType, input);
-    void computeInputData(manager, input);
-    void computeIntervalInputData(manager, input);
-
     bool isFirst;
     bool isFinal;
 
-    uint32_t eventType;
-
-    std::vector<Pointer> pointers;
-    std::vector<Pointer> changedPointers;
+    uint32_t type;
 
     uint32_t timeStamp;
     uint32_t deltaTime;
-    float deltaX;
-    float deltaY;
-    float centerX;
-    float centerY;
-    float angle;
-    float distance;
+    uint32_t direction;
     uint32_t offsetDirection;
 
+    float angle;
+    float distance;
     float scale;
     float rotation;
+
+    float velocityX;
+    float velocityY;
+
+    float deltaX;
+    float deltaY;
+
+    float centerX;
+    float centerY;
 };
 
 
-class Manager
+class Hammer
 {
 public:
+    static Hammer * instance();
 
-    InputData * simpleCloneInputData(input);
+    void OnTouchEvent(const SDL_TouchFingerEvent& event, const SDL_Touch * touch);
+    void recognize(Input * input);
 
-    void recognize(input);
+    void OnPanEvent(const Input * input);
+    void OnPinchEvent(const Input * input);
+    void OnSwipeEvent(const Input * input);
+    void OnTapEvent(const Input * input);
+    void OnDoubleTapEvent(const Input * input);
+    void OnLongPressEvent(const Input * input);
 
-    InputData * firstInput;
-    InputData * firstMultiple;
-    InputData * lastInterval;
+private:
+    DISALLOW_IMPLICIT_CONSTRUCTORS(Hammer);
+
+    size_t prevFingers_;
+
+    Input * firstInput_;
+    Input * firstMultiple_;
+    Input * lastInterval_;
+};
+
+
+class Recognizer
+{
+public:
+    void recognize(Input * input);
+
+private:
+    uint32_t state_;
 };

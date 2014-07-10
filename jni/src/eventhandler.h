@@ -20,10 +20,11 @@ public:
     int OnEventReceived(const SDL_Event& event);
 
     int OnWindowEvent(const SDL_WindowEvent& window);
+
     int OnKeyEvent(const SDL_KeyboardEvent& key);
     int OnFingerEvent(const SDL_TouchFingerEvent& finger);
-    int OnMouseButton(const SDL_MouseButtonEvent& mouse);
-    int OnMouseMotion(const SDL_MouseMotionEvent& mouse);
+    int OnMouseEvent(const SDL_Event& event);
+
     int OnDollarGesture(const SDL_DollarGestureEvent& gesture);
     int OnMultiGesture(const SDL_MultiGestureEvent& gesture);
 
