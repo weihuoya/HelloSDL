@@ -1,4 +1,5 @@
 #include "hammer.h"
+#include <SDL_timer.h>
 
 
 #define COMPUTE_INTERVAL 25
@@ -13,6 +14,53 @@ Hammer * Hammer::instance()
 
 Hammer::Hammer() : prevFingers_(0), firstInput_(0), firstMultiple_(0), lastInterval_(0)
 {
+}
+
+
+Uint32 SDLCALL Hammer::sTimeHandler(Uint32 interval, void *param)
+{
+    Hammer * hammer = static_cast<Hammer*>(param);
+    TIMEHANDLERS& timehandlers = hammer->timehandlers_;
+
+    if(timehandlers.empty())
+    {
+        SDL_RemoveTimer(hammer->timerId_);
+        hammer->timerId_ = 0;
+    }
+    else
+    {
+        size_t count = 0, timeout = 0;
+        TIMEHANDLERS::iterator step, iter;
+        TIMEHANDLERS::iterator last = timehandlers.end();
+
+        for(step = iter = timehandlers.begin(); iter != last; ++iter)
+        {
+            timeout = (*iter).second - interval;
+            if(timeout > 0)
+            {
+                (*iter).second = timeout;
+                *step++ = *iter;
+                ++count;
+            }
+            else
+            {
+                (*iter).first();
+            }
+        }
+        timehandlers.resize(count);
+    }
+}
+
+
+void Hammer::setTimeout(TimerCallback callback, Uint32 interval)
+{
+    //timehandlers_.push_back(std::make_pair(callback, interval));
+    timehandlers_.emplace_back(callback, interval);
+
+    if(timerId_ == 0)
+    {
+        timerId_ = SDL_AddTimer(50, Hammer::sTimeHandler, this);
+    }
 }
 
 
@@ -188,3 +236,61 @@ void Hammer::OnLongPressEvent(const Input * input)
 {
 }
 
+
+
+
+Recognizer::Recognizer()
+{
+}
+
+
+void Recognizer::recognize(Input * input)
+{
+}
+
+
+uint32_t Recognizer::process(Input * input)
+{
+    return STATE_FAILED;
+}
+
+
+TapRecognizer::TapRecognizer()
+{
+    prevTimeStamp_ = 0;
+    prevCenterX_ = 0;
+    prevCenterY_ = 0;
+    tapCount_ = 0;
+
+    pointers_ = 1;
+    taps_ = 1;
+    interval_ = 300;
+    taptime_ = 250;
+    moveThreshold_ = 10;
+    offsetThreshold_ = 10;
+}
+
+
+uint32_t TapRecognizer::process(Input * input)
+{
+    if(input->numFingers == pointers_ && input->distance < moveThreshold_ && input->deltaTime < taptime_)
+    {
+        if(input->type == INPUT_END)
+        {
+            bool validInterval = prevTimeStamp_ > 0 ? (input->timeStamp - prevTimeStamp_ < interval_) : true;
+
+            float deltaX = input->centerX - prevCenterX_;
+            float deltaY = input->centerY - prevCenterY_;
+            float distance = sqrt(deltaX * deltaX + deltaY * deltaY);
+
+            if(validInterval && distance < offsetThreshold_)
+            {
+                tapCount_ = tapCount_ + 1;
+            }
+            else
+            {
+                tapCount_ = 1;
+            }
+        }
+    }
+}

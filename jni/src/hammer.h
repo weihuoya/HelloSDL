@@ -1,4 +1,7 @@
 
+#include <vector>
+#include <utility>
+
 
 enum INPUT_DIRECTION {
     DIRECTION_NONE,
@@ -34,6 +37,9 @@ enum RECOGNIZE_STATE {
 
 struct Input
 {
+    int numFingers;
+    SDL_Finger ** fingers;
+
     bool isFirst;
     bool isFinal;
 
@@ -60,6 +66,9 @@ struct Input
 };
 
 
+typedef void (SDLCALL * TimeCallback) ();
+
+
 class Hammer
 {
 public:
@@ -67,6 +76,9 @@ public:
 
     void OnTouchEvent(const SDL_TouchFingerEvent& event, const SDL_Touch * touch);
     void recognize(Input * input);
+
+    void setTimeout(TimerCallback callback, Uint32 interval);
+    static Uint32 SDLCALL sTimeHandler(Uint32 interval, void *param);
 
     void OnPanEvent(const Input * input);
     void OnPinchEvent(const Input * input);
@@ -77,6 +89,10 @@ public:
 
 private:
     DISALLOW_IMPLICIT_CONSTRUCTORS(Hammer);
+
+    typedef std::vector< std::pair<TimeCallback, Uint32> > TIMEHANDLERS;
+    TIMEHANDLERS timehandlers_;
+    SDL_TimerID timerId_;
 
     size_t prevFingers_;
 
@@ -89,8 +105,39 @@ private:
 class Recognizer
 {
 public:
+    virtual ~Recognizer();
+
     void recognize(Input * input);
 
-private:
+protected:
+    Recognizer();
+
+    virtual uint32_t process(Input * input);
+
     uint32_t state_;
+};
+
+
+class TapRecognizer : public Recognizer
+{
+public:
+    TapRecognizer();
+    virtual ~TapRecognizer();
+
+protected:
+    virtual uint32_t process(Input * input);
+
+    // previous
+    float prevTimeStamp_;
+    float prevCenterX_;
+    float prevCenterY_;
+    size_t tapCount_;
+
+    // config
+    size_t pointers_;
+    size_t taps_;
+    size_t interval_;
+    size_t taptime_;
+    size_t moveThreshold_;
+    size_t offsetThreshold_;
 };

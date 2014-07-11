@@ -22,7 +22,7 @@ int main(int argc, char** argv)
 {
     SDL_DisplayMode displayMode;
 
-    if (SDL_Init(SDL_INIT_VIDEO) != 0) {
+    if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
         SDL_Log(SDL_GetError());
         return -1;
     }
