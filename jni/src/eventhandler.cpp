@@ -15,6 +15,8 @@
 #include "SDL_events_c.h"
 #include "SDL_touch_c.h"
 
+#include "input.h"
+
 
 EventHandler::EventHandler() : touchId_(0), prevDistance_(0.0f)
 {
@@ -150,11 +152,14 @@ int EventHandler::OnFingerEvent(const SDL_TouchFingerEvent& event)
     const SDL_Touch * touch = SDL_GetTouch(touchId);
     if(touch)
     {
+        Hammer::instance()->OnTouchEvent(event, touch);
+        /*
         for(i = 0; i < touch->num_fingers; ++i)
         {
             finger = touch->fingers[i];
         }
         SDL_Log("[finger] (%lld, %d)", touch->id, touch->num_fingers, touch->fingers);
+        */
     }
 
     /*if(event.type == SDL_FINGERDOWN)

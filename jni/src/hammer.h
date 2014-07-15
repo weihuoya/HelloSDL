@@ -141,3 +141,72 @@ protected:
     size_t moveThreshold_;
     size_t offsetThreshold_;
 };
+
+
+class PanRecognizer : public Recognizer
+{
+public:
+    PanRecognizer();
+    virtual ~PanRecognizer();
+
+protected:
+    virtual uint32_t process(Input * input);
+
+    // config
+    size_t pointers_;
+    size_t threshold_;
+    size_t direction_;
+};
+
+
+
+class PinchRecognizer : public Recognizer
+{
+public:
+    PinchRecognizer();
+    virtual ~PinchRecognizer();
+
+protected:
+    virtual uint32_t process(Input * input);
+
+    // config
+    size_t pointers_;
+    size_t threshold_;
+    size_t direction_;
+};
+
+
+
+
+class RotateRecognizer : public Recognizer
+{
+public:
+    RotateRecognizer();
+    virtual ~RotateRecognizer();
+
+protected:
+    virtual uint32_t process(Input * input);
+
+    // config
+    size_t pointers_;
+    size_t threshold_;
+    size_t direction_;
+};
+
+
+
+
+class SwipeRecognizer : public Recognizer
+{
+public:
+    SwipeRecognizer();
+    virtual ~SwipeRecognizer();
+
+protected:
+    virtual uint32_t process(Input * input);
+
+    // config
+    size_t pointers_;
+    size_t threshold_;
+    size_t direction_;
+};

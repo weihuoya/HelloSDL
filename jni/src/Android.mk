@@ -24,6 +24,7 @@ LOCAL_SRC_FILES := \
     gltool.cpp \
     sdlrwops.cpp \
     matrix.cpp \
+    input.cpp \
     quaternion.cpp
 
 LOCAL_SHARED_LIBRARIES := SDL2 SDL2_image SDL2_ttf sigc++

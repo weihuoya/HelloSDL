@@ -77,6 +77,9 @@ void Hammer::OnTouchEvent(const SDL_TouchFingerEvent& event, const SDL_Touch * t
     input->isFinal = isFinal;
     input->eventType = event.type;
 
+    input->fingers = (SDL_Finger **)malloc(sizeof(SDL_Finger) * numFingers);
+    memcpy(input->fingers, touch->fingers, sizeof(SDL_Finger) * numFingers);
+
     if(!firstInput_) firstInput_ = input;
 
     if(numFingers == 1)
@@ -243,6 +246,9 @@ Recognizer::Recognizer()
 {
 }
 
+Recognizer::~Recognizer()
+{
+}
 
 void Recognizer::recognize(Input * input)
 {
@@ -253,6 +259,9 @@ uint32_t Recognizer::process(Input * input)
 {
     return STATE_FAILED;
 }
+
+
+
 
 
 TapRecognizer::TapRecognizer()
@@ -270,6 +279,9 @@ TapRecognizer::TapRecognizer()
     offsetThreshold_ = 10;
 }
 
+TapRecognizer::~TapRecognizer()
+{
+}
 
 uint32_t TapRecognizer::process(Input * input)
 {
@@ -293,4 +305,64 @@ uint32_t TapRecognizer::process(Input * input)
             }
         }
     }
+}
+
+
+
+
+PanRecognizer::PanRecognizer()
+{
+}
+
+PanRecognizer::~PanRecognizer()
+{
+}
+
+uint32_t PanRecognizer::process(Input * input)
+{
+}
+
+
+
+
+PinchRecognizer::PinchRecognizer()
+{
+}
+
+PinchRecognizer::~PinchRecognizer()
+{
+}
+
+uint32_t PinchRecognizer::process(Input * input)
+{
+}
+
+
+
+
+RotateRecognizer::RotateRecognizer()
+{
+}
+
+RotateRecognizer::~RotateRecognizer()
+{
+}
+
+uint32_t RotateRecognizer::process(Input * input)
+{
+}
+
+
+
+
+SwipeRecognizer::SwipeRecognizer()
+{
+}
+
+SwipeRecognizer::~SwipeRecognizer()
+{
+}
+
+uint32_t SwipeRecognizer::process(Input * input)
+{
 }
