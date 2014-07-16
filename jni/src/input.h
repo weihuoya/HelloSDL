@@ -3,6 +3,8 @@
 
 #include <vector>
 #include <memory>
+#include <utility>
+
 #include <SDL_events.h>
 
 #include "gltool.h"
@@ -27,6 +29,7 @@ enum INPUT_TYPE {
     INPUT_END,
     INPUT_CANCEL,
 };
+
 
 
 struct Input
@@ -69,25 +72,6 @@ struct Input
 
     bool isFirst;
     bool isFinal;
-};
-
-
-class Hammer
-{
-public:
-    static Hammer * instance();
-    void OnTouchEvent(const SDL_TouchFingerEvent& event, const SDL_Touch * touch);
-
-    void recognize(const Input * input);
-
-private:
-    DISALLOW_IMPLICIT_CONSTRUCTORS(Hammer);
-
-    std::shared_ptr<Input> firstInput_;
-    std::shared_ptr<Input> firstMultiple_;
-    std::shared_ptr<Input> lastInterval_;
-
-    size_t prevFingers_;
 };
 
 
