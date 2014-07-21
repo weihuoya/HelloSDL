@@ -1,10 +1,12 @@
 #ifndef __hellosdl__hammer__
 #define __hellosdl__hammer__
 
-
 #include <memory>
 #include <vector>
 #include <utility>
+
+#include "gltool.h"
+#include "input.h"
 
 
 typedef void (SDLCALL * TimeCallback) ();

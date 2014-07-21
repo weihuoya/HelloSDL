@@ -1,6 +1,8 @@
 #ifndef __hellosdl__recognizer__
 #define __hellosdl__recognizer__
 
+#include "input.h"
+
 
 enum RECOGNIZE_STATE {
     STATE_POSSIBLE,

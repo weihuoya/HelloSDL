@@ -1,5 +1,7 @@
-#include "hammer.h"
 #include <SDL_timer.h>
+#include <SDL_events.h>
+
+#include "hammer.h"
 
 
 #define COMPUTE_INTERVAL 25

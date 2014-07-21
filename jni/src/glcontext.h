@@ -23,7 +23,7 @@ public:
 
     void flush();
 
-    void incRotate(float rotateX, float rotateY);
+    void incRotate(float rotateX, float rotateY, float rotateZ);
     void incTranslate(float x, float y);
     void incScale(float scale);
 

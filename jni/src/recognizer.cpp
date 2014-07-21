@@ -45,6 +45,8 @@ TapRecognizer::~TapRecognizer()
 
 uint32_t TapRecognizer::process(Input * input)
 {
+    uint32_t state = STATE_FAILED;
+
     if(input->numFingers == pointers_ && input->distance < moveThreshold_ && input->deltaTime < taptime_)
     {
         if(input->type == INPUT_END)
@@ -63,6 +65,13 @@ uint32_t TapRecognizer::process(Input * input)
             {
                 tapCount_ = 1;
             }
+
+            // event, timer, callback
+            timerId = hammer->timer:after(std::function([] (){}), interval_);
+            hammer->timer:start();
+
+            hammer->timer:cancel(timerId);
+            timerId = 0;
         }
     }
 }

@@ -5,9 +5,6 @@
 #include <memory>
 #include <utility>
 
-#include <SDL_events.h>
-
-#include "gltool.h"
 #include "SDL_touch_c.h"
 
 

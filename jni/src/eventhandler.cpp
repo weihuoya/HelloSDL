@@ -2,9 +2,6 @@
 //  eventhandler.cpp
 //  HelloSDL
 //
-//  Created by Moqikaka on 14-5-5.
-//  Copyright (c) 2014年 Moqikaka. All rights reserved.
-//
 
 #include <SDL_touch.h>
 #include <SDL_log.h>
@@ -15,7 +12,7 @@
 #include "SDL_events_c.h"
 #include "SDL_touch_c.h"
 
-#include "input.h"
+//#include "input.h"
 
 
 EventHandler::EventHandler() : touchId_(0), prevDistance_(0.0f)
@@ -152,7 +149,7 @@ int EventHandler::OnFingerEvent(const SDL_TouchFingerEvent& event)
     const SDL_Touch * touch = SDL_GetTouch(touchId);
     if(touch)
     {
-        Hammer::instance()->OnTouchEvent(event, touch);
+        //Hammer::instance()->OnTouchEvent(event, touch);
         /*
         for(i = 0; i < touch->num_fingers; ++i)
         {
