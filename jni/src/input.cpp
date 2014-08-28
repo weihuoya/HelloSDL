@@ -11,6 +11,7 @@ Input::Input() :
 {
 }
 
+
 Input::Input(const Input& rhs)
 {
     fingers = rhs.fingers;
@@ -40,9 +41,11 @@ Input::Input(const Input& rhs)
     isFinal = rhs.isFinal;
 }
 
+
 Input::~Input()
 {
 }
+
 
 void Input::swap(Input& rhs)
 {
@@ -73,6 +76,7 @@ void Input::swap(Input& rhs)
     std::swap(isFinal, rhs.isFinal);
 }
 
+
 void Input::setFingers(const SDL_Touch * touch)
 {
     SDL_Finger * p, * f;
@@ -98,6 +102,7 @@ void Input::setFingers(const SDL_Touch * touch)
 
     fingers.resize(numFingers);
 }
+
 
 void Input::dump() const
 {

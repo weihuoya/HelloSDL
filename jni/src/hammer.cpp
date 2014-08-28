@@ -6,18 +6,6 @@
 
 #define COMPUTE_INTERVAL 25
 
-
-Hammer * Hammer::instance()
-{
-    static Hammer handler;
-    return &handler;
-}
-
-Hammer::Hammer() : prevFingers_(0)
-{
-}
-
-
 static inline float getDistance(float x, float y)
 {
     return sqrt(x * x + y * y);
@@ -30,22 +18,35 @@ static inline float getRotate(float x, float y)
 
 static inline uint32_t getDirection(float x, float y)
 {
-    uint32_t direction = DIRECTION_NONE;
+    uint32_t direction = Input::DIRECTION_NONE;
 
     if(x == y)
     {
-        direction = DIRECTION_NONE;
+        direction = Input::DIRECTION_NONE;
     }
     else if(abs(x) >= abs(y))
     {
-        direction = x > 0 ? DIRECTION_LEFT : DIRECTION_RIGHT;
+        direction = x > 0 ? Input::DIRECTION_LEFT : Input::DIRECTION_RIGHT;
     }
     else
     {
-        direction = y > 0 ? DIRECTION_UP : DIRECTION_DOWN;
+        direction = y > 0 ? Input::DIRECTION_UP : Input::DIRECTION_DOWN;
     }
 
     return direction;
+}
+
+
+
+
+Hammer * Hammer::instance()
+{
+    static Hammer handler;
+    return &handler;
+}
+
+Hammer::Hammer() : prevFingers_(0)
+{
 }
 
 
@@ -63,16 +64,16 @@ void Hammer::OnTouchEvent(const SDL_TouchFingerEvent& event, const SDL_Touch * t
     if(event.type == SDL_FINGERDOWN)
     {
         isFirst = (prevFingers_ == 0);
-        eventType = INPUT_START;
+        eventType = Input::INPUT_START;
     }
     else if(event.type == SDL_FINGERMOTION)
     {
-        eventType = INPUT_MOVE;
+        eventType = Input::INPUT_MOVE;
     }
     else //if(event.type == SDL_FINGERUP)
     {
         isFinal = (numFingers == 0);
-        eventType = INPUT_END;
+        eventType = Input::INPUT_END;
     }
     //else
     //{
@@ -233,7 +234,7 @@ void Hammer::recognize(const Input * input)
 }
 
 
-Uint32 SDLCALL Hammer::sTimeHandler(Uint32 interval, void *param)
+Uint32 SDLCALL Hammer::sTimeHandler(Uint32 delta, void *param)
 {
     Hammer * hammer = static_cast<Hammer*>(param);
     TIMEHANDLERS& timehandlers = hammer->timehandlers_;
@@ -245,22 +246,21 @@ Uint32 SDLCALL Hammer::sTimeHandler(Uint32 interval, void *param)
     }
     else
     {
-        size_t count = 0, timeout = 0;
+        size_t count = 0;
         TIMEHANDLERS::iterator step, iter;
         TIMEHANDLERS::iterator last = timehandlers.end();
 
         for(step = iter = timehandlers.begin(); iter != last; ++iter)
         {
-            timeout = (*iter).second - interval;
-            if(timeout > 0)
+            iter->ticktock = iter->ticktock + delta
+            if(iter->ticktock < iter->timeout)
             {
-                (*iter).second = timeout;
                 *step++ = *iter;
                 ++count;
             }
             else
             {
-                (*iter).first();
+                iter->callback();
             }
         }
         timehandlers.resize(count);
@@ -268,15 +268,24 @@ Uint32 SDLCALL Hammer::sTimeHandler(Uint32 interval, void *param)
 }
 
 
-void Hammer::setTimeout(TimerCallback callback, Uint32 interval)
+Uint32 Hammer::setTimeout(TimerCallback callback, Uint32 timeout)
 {
-    //timehandlers_.push_back(std::make_pair(callback, interval));
-    timehandlers_.emplace_back(callback, interval);
+    static Uint32 sSlotId = 0;
+
+    timehandlers_.emplace_back(callback, timeout, ++sSlotId);
 
     if(timerId_ == 0)
     {
         timerId_ = SDL_AddTimer(50, Hammer::sTimeHandler, this);
     }
+
+    return sSlotId;
+}
+
+
+void Hammer::clearTimeout(Uint32 slotId)
+{
+    std::remove_if(timehandlers_.begin(), timehandlers_.end(), [slotId](const TimeSlot& slot) { return slot.slotId == slotId; });
 }
 
 

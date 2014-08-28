@@ -8,29 +8,32 @@
 #include "SDL_touch_c.h"
 
 
-enum INPUT_DIRECTION {
-    DIRECTION_NONE,
-    DIRECTION_UP,
-    DIRECTION_RIGHT,
-    DIRECTION_DOWN,
-    DIRECTION_LEFT,
-    DIRECTION_HORIZONTAL,
-    DIRECTION_VERTICAL,
-    DIRECTION_ALL,
-};
 
-
-enum INPUT_TYPE {
-    INPUT_START,
-    INPUT_MOVE,
-    INPUT_END,
-    INPUT_CANCEL,
-};
 
 
 
 struct Input
 {
+    enum INPUT_DIRECTION {
+        DIRECTION_NONE,
+        DIRECTION_UP,
+        DIRECTION_RIGHT,
+        DIRECTION_DOWN,
+        DIRECTION_LEFT,
+        DIRECTION_HORIZONTAL,
+        DIRECTION_VERTICAL,
+        DIRECTION_ALL,
+    };
+
+
+    enum INPUT_TYPE {
+        INPUT_START,
+        INPUT_MOVE,
+        INPUT_END,
+        INPUT_CANCEL,
+    };
+
+
     Input();
     Input(const Input& rhs);
     ~Input();

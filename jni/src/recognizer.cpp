@@ -14,6 +14,10 @@ void Recognizer::recognize(Input * input)
 {
 }
 
+void Recognizer::trigger(Input * input)
+{
+    Hammer::instance()->trigger(type_, state_, input);
+}
 
 uint32_t Recognizer::process(Input * input)
 {
@@ -43,13 +47,18 @@ TapRecognizer::~TapRecognizer()
 {
 }
 
+void Recognizer::trigger(Input * input)
+{
+    Hammer::instance()->trigger(0, state_, input);
+}
+
 uint32_t TapRecognizer::process(Input * input)
 {
     uint32_t state = STATE_FAILED;
 
     if(input->numFingers == pointers_ && input->distance < moveThreshold_ && input->deltaTime < taptime_)
     {
-        if(input->type == INPUT_END)
+        if(input->type == Input::INPUT_END)
         {
             bool validInterval = prevTimeStamp_ > 0 ? (input->timeStamp - prevTimeStamp_ < interval_) : true;
 
@@ -67,8 +76,7 @@ uint32_t TapRecognizer::process(Input * input)
             }
 
             // event, timer, callback
-            timerId = hammer->timer:after(std::function([] (){}), interval_);
-            hammer->timer:start();
+            Hammer::instance()->setTimeout(std::function([] (){}), interval_);
 
             hammer->timer:cancel(timerId);
             timerId = 0;

@@ -4,27 +4,28 @@
 #include "input.h"
 
 
-enum RECOGNIZE_STATE {
-    STATE_POSSIBLE,
-    STATE_BEGAN,
-    STATE_CHANGED,
-    STATE_ENDED,
-    STATE_RECOGNIZED,
-    STATE_CANCELLED,
-    STATE_FAILED,
-};
 
 
 class Recognizer
 {
 public:
+    enum RECOGNIZER_TYPE {
+        TYPE_TAP,
+        TYPE_PAN,
+        TYPE_PINCH,
+        TYPE_ROTATE,
+        TYPE_SWIPE,
+    };
+
     virtual ~Recognizer();
     void recognize(Input * input);
+    void trigger(Input * input);
 
 protected:
     Recognizer();
     virtual uint32_t process(Input * input);
 
+    uint32_t type_;
     uint32_t state_;
 };
 
