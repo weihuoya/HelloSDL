@@ -92,11 +92,11 @@ uint32_t SDLCALL Timer::sTimeHandler(uint32_t interval, void *param)
             if(timeout > iter->delay)
             {
                 iter->callback(timeout);
-                if(iter->type == 0)
+                if(iter->type == Timer::TIMER_INTERVAL)
                 {
                     iter->tick = 0;
                 }
-                else
+                else if(iter->type == Timer::TIMER_TIMEOUT)
                 {
                     running = false;
                 }

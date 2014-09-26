@@ -12,6 +12,7 @@
 #include "SDL_events_c.h"
 #include "SDL_touch_c.h"
 
+#include "hammer.h"
 //#include "input.h"
 
 
@@ -149,7 +150,7 @@ int EventHandler::OnFingerEvent(const SDL_TouchFingerEvent& event)
     const SDL_Touch * touch = SDL_GetTouch(touchId);
     if(touch)
     {
-        //Hammer::instance()->OnTouchEvent(event, touch);
+        Hammer::instance()->OnTouchEvent(event, touch);
         /*
         for(i = 0; i < touch->num_fingers; ++i)
         {

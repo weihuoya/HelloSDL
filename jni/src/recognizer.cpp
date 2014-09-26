@@ -1,8 +1,9 @@
 #include "recognizer.h"
+#include "hammer.h"
 
 
 
-Recognizer::Recognizer()
+Recognizer::Recognizer() : type_(0)
 {
 }
 
@@ -21,9 +22,8 @@ void Recognizer::trigger(Input * input)
 
 uint32_t Recognizer::process(Input * input)
 {
-    return STATE_FAILED;
+    return 0;
 }
-
 
 
 
@@ -47,16 +47,12 @@ TapRecognizer::~TapRecognizer()
 {
 }
 
-void Recognizer::trigger(Input * input)
-{
-    Hammer::instance()->trigger(0, state_, input);
-}
-
 uint32_t TapRecognizer::process(Input * input)
 {
-    uint32_t state = STATE_FAILED;
+    uint32_t state = 0;
+    uint32_t size = input->fingers.size();
 
-    if(input->numFingers == pointers_ && input->distance < moveThreshold_ && input->deltaTime < taptime_)
+    if(size == pointers_ && input->distance < moveThreshold_ && input->deltaTime < taptime_)
     {
         if(input->type == Input::INPUT_END)
         {
@@ -76,10 +72,9 @@ uint32_t TapRecognizer::process(Input * input)
             }
 
             // event, timer, callback
-            Hammer::instance()->setTimeout(std::function([] (){}), interval_);
-
-            hammer->timer:cancel(timerId);
-            timerId = 0;
+            //Hammer::instance()->setTimeout([] (uint32_t x){}, interval_);
+            //hammer->timer:cancel(timerId);
+            //timerId = 0;
         }
     }
 }
@@ -89,6 +84,12 @@ uint32_t TapRecognizer::process(Input * input)
 
 PanRecognizer::PanRecognizer()
 {
+    pointers_ = 1;
+    threshold_ = 10;
+    direction_ = Input::DIRECTION_ALL;
+
+    previousX_ = 0;
+    previousY_ = 0;
 }
 
 PanRecognizer::~PanRecognizer()
@@ -97,6 +98,41 @@ PanRecognizer::~PanRecognizer()
 
 uint32_t PanRecognizer::process(Input * input)
 {
+    size_t directionX;
+    size_t directionY;
+
+    size_t x = input->deltaX - previousX_;
+    size_t y = input->deltaY - previousY_;
+
+    // 水平
+    if(x > threshold_)
+    {
+        directionX = Input::DIRECTION_RIGHT;
+    }
+    else if(x < -threshold_)
+    {
+        directionX = Input::DIRECTION_LEFT;
+    }
+    else
+    {
+        directionX = Input::DIRECTION_NONE;
+    }
+
+    // 垂直
+    if(y > threshold_)
+    {
+        directionY = Input::DIRECTION_UP;
+    }
+    else if(y < -threshold_)
+    {
+        directionY = Input::DIRECTION_DOWN;
+    }
+    else
+    {
+        directionY = Input::DIRECTION_NONE;
+    }
+
+    return directionX & directionY;
 }
 
 
@@ -104,6 +140,8 @@ uint32_t PanRecognizer::process(Input * input)
 
 PinchRecognizer::PinchRecognizer()
 {
+    pointers_ = 2;
+    threshold_ = 0;
 }
 
 PinchRecognizer::~PinchRecognizer()
@@ -112,6 +150,15 @@ PinchRecognizer::~PinchRecognizer()
 
 uint32_t PinchRecognizer::process(Input * input)
 {
+    size_t size = input->fingers.size();
+    size_t scale = abs(input->scale);
+
+    if(size == pointers_ && scale > threshold_)
+    {
+    }
+    else
+    {
+    }
 }
 
 
@@ -119,6 +166,8 @@ uint32_t PinchRecognizer::process(Input * input)
 
 RotateRecognizer::RotateRecognizer()
 {
+    pointers_ = 2;
+    threshold_ = 0;
 }
 
 RotateRecognizer::~RotateRecognizer()
@@ -127,6 +176,15 @@ RotateRecognizer::~RotateRecognizer()
 
 uint32_t RotateRecognizer::process(Input * input)
 {
+    size_t size = input->fingers.size();
+    size_t rotation = abs(input->rotation);
+
+    if(size == pointers_ && rotation > threshold_)
+    {
+    }
+    else
+    {
+    }
 }
 
 
@@ -134,6 +192,10 @@ uint32_t RotateRecognizer::process(Input * input)
 
 SwipeRecognizer::SwipeRecognizer()
 {
+    pointers_ = 1;
+    threshold_ = 10;
+    velocity_ = 0.65;
+    direction_ = Input::DIRECTION_HORIZONTAL | Input::DIRECTION_VERTICAL;
 }
 
 SwipeRecognizer::~SwipeRecognizer()
@@ -142,4 +204,8 @@ SwipeRecognizer::~SwipeRecognizer()
 
 uint32_t SwipeRecognizer::process(Input * input)
 {
+    size_t size = input->fingers.size();
+    size_t velocity = input->velocity;
+    size_t velocityX = input->velocityX;
+    size_t velocityY = input->velocityY;
 }

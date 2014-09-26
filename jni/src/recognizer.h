@@ -18,6 +18,7 @@ public:
     };
 
     virtual ~Recognizer();
+
     void recognize(Input * input);
     void trigger(Input * input);
 
@@ -68,6 +69,9 @@ protected:
     size_t pointers_;
     size_t threshold_;
     size_t direction_;
+    //previous
+    size_t previousX_;
+    size_t previousY_;
 };
 
 
@@ -83,7 +87,6 @@ protected:
     // config
     size_t pointers_;
     size_t threshold_;
-    size_t direction_;
 };
 
 
@@ -99,7 +102,6 @@ protected:
     // config
     size_t pointers_;
     size_t threshold_;
-    size_t direction_;
 };
 
 
@@ -115,6 +117,7 @@ protected:
     // config
     size_t pointers_;
     size_t threshold_;
+    size_t velocity_;
     size_t direction_;
 };
 

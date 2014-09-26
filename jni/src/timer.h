@@ -1,5 +1,5 @@
-#ifndef __hellosdl__recognizer__
-#define __hellosdl__recognizer__
+#ifndef __hellosdl__timer__
+#define __hellosdl__timer__
 
 #include <SDL.h>
 #include <functional>
@@ -56,4 +56,4 @@ private:
 };
 
 
-#endif /* defined(__HelloSDL__recognizer__) */
+#endif /* defined(__HelloSDL__timer__) */

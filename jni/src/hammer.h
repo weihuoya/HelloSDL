@@ -9,7 +9,7 @@
 #include "gltool.h"
 #include "input.h"
 
-
+#include "timer.h"
 
 
 class Hammer
@@ -25,16 +25,15 @@ public:
         EVENT_LONG_PRESS,
     };
 
-    typedef std::function<void ()> TimeCallback;
-
     static Hammer * instance();
 
     void OnTouchEvent(const SDL_TouchFingerEvent& event, const SDL_Touch * touch);
     void recognize(const Input * input);
 
-    Uint32 setTimeout(TimerCallback& callback, Uint32 timeout);
+    Uint32 setTimeout(Timer::Callback& callback, Uint32 timeout);
     void clearTimeout(Uint32 slotId);
-    static Uint32 SDLCALL sTimeHandler(Uint32 interval, void *param);
+
+    void trigger(uint32_t type, uint32_t state, const Input * input);
 
     void OnPanEvent(const Input * input);
     void OnPinchEvent(const Input * input);
@@ -48,18 +47,7 @@ public:
 private:
     DISALLOW_IMPLICIT_CONSTRUCTORS(Hammer);
 
-    struct TimeSlot {
-        TimeSlot(TimeCallback& callback, Uint32 timeout, Uint32 slotId) : callback(callback), ticktock(0), timeout(timeout), slotId(slotId) {}
-
-        TimeCallback callback;
-        Uint32 ticktock;
-        Uint32 timeout;
-        Uint32 slotId;
-    };
-    typedef std::vector<TimeSlot> TIMEHANDLERS;
-
-    TIMEHANDLERS timehandlers_;
-    SDL_TimerID timerId_;
+    Timer timer_;
 
     std::shared_ptr<Input> firstInput_;
     std::shared_ptr<Input> firstMultiple_;

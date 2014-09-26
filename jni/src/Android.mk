@@ -25,7 +25,10 @@ LOCAL_SRC_FILES := \
     sdlrwops.cpp \
     matrix.cpp \
     timer.cpp \
-    quaternion.cpp
+    quaternion.cpp \
+    hammer.cpp \
+    input.cpp \
+    recognizer.cpp
 
 LOCAL_SHARED_LIBRARIES := SDL2 SDL2_image SDL2_ttf sigc++
 

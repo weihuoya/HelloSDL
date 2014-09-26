@@ -1,6 +1,8 @@
 #include <SDL_timer.h>
 #include <SDL_events.h>
 
+#include <algorithm>
+
 #include "hammer.h"
 
 
@@ -228,67 +230,32 @@ void Hammer::OnTouchEvent(const SDL_TouchFingerEvent& event, const SDL_Touch * t
 }
 
 
+// recognize
 void Hammer::recognize(const Input * input)
 {
     input->dump();
 }
 
 
-Uint32 SDLCALL Hammer::sTimeHandler(Uint32 delta, void *param)
+void Hammer::trigger(uint32_t type, uint32_t state, const Input * input)
 {
-    Hammer * hammer = static_cast<Hammer*>(param);
-    TIMEHANDLERS& timehandlers = hammer->timehandlers_;
-
-    if(timehandlers.empty())
-    {
-        SDL_RemoveTimer(hammer->timerId_);
-        hammer->timerId_ = 0;
-    }
-    else
-    {
-        size_t count = 0;
-        TIMEHANDLERS::iterator step, iter;
-        TIMEHANDLERS::iterator last = timehandlers.end();
-
-        for(step = iter = timehandlers.begin(); iter != last; ++iter)
-        {
-            iter->ticktock = iter->ticktock + delta
-            if(iter->ticktock < iter->timeout)
-            {
-                *step++ = *iter;
-                ++count;
-            }
-            else
-            {
-                iter->callback();
-            }
-        }
-        timehandlers.resize(count);
-    }
 }
 
 
-Uint32 Hammer::setTimeout(TimerCallback callback, Uint32 timeout)
+// timer
+Uint32 Hammer::setTimeout(Timer::Callback& callback, Uint32 timeout)
 {
-    static Uint32 sSlotId = 0;
-
-    timehandlers_.emplace_back(callback, timeout, ++sSlotId);
-
-    if(timerId_ == 0)
-    {
-        timerId_ = SDL_AddTimer(50, Hammer::sTimeHandler, this);
-    }
-
-    return sSlotId;
+    return timer_.add(callback, Timer::TIMER_TIMEOUT, timeout);
 }
 
 
 void Hammer::clearTimeout(Uint32 slotId)
 {
-    std::remove_if(timehandlers_.begin(), timehandlers_.end(), [slotId](const TimeSlot& slot) { return slot.slotId == slotId; });
+    timer_.remove(slotId);
 }
 
 
+// event handler
 void Hammer::OnPanEvent(const Input * input)
 {
 }
