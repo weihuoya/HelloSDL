@@ -8,6 +8,7 @@
 
 #define COMPUTE_INTERVAL 25
 
+
 static inline float getDistance(float x, float y)
 {
     return sqrt(x * x + y * y);
@@ -47,8 +48,14 @@ Hammer * Hammer::instance()
     return &handler;
 }
 
+
 Hammer::Hammer() : prevFingers_(0)
 {
+    recognizers_.emplace_back(new TapRecognizer());
+    recognizers_.emplace_back(new PanRecognizer());
+    recognizers_.emplace_back(new PinchRecognizer());
+    recognizers_.emplace_back(new RotateRecognizer());
+    recognizers_.emplace_back(new SwipeRecognizer());
 }
 
 
@@ -223,6 +230,11 @@ void Hammer::OnTouchEvent(const SDL_TouchFingerEvent& event, const SDL_Touch * t
 
     if(isFinal)
     {
+        for(auto recognizer : recognizers_)
+        {
+            recognizer->reset();
+        }
+
         firstInput_.reset();
         firstMultiple_.reset();
         lastInterval_.reset();
@@ -233,19 +245,43 @@ void Hammer::OnTouchEvent(const SDL_TouchFingerEvent& event, const SDL_Touch * t
 // recognize
 void Hammer::recognize(const Input * input)
 {
-    input->dump();
+    //input->dump();
+    for(auto recognizer : recognizers_)
+    {
+        recognizer->recognize(input);
+    }
 }
 
 
-void Hammer::trigger(uint32_t type, uint32_t state, const Input * input)
+void Hammer::trigger(uint32_t type)
 {
+    switch(type)
+    {
+        case Recognizer::TYPE_TAP:
+            SDL_Log("[recognizer] tap");
+            break;
+        case Recognizer::TYPE_PAN:
+            SDL_Log("[recognizer] pan");
+            break;
+        case Recognizer::TYPE_PINCH:
+            SDL_Log("[recognizer] pinch");
+            break;
+        case Recognizer::TYPE_ROTATE:
+            SDL_Log("[recognizer] rotate");
+            break;
+        case Recognizer::TYPE_SWIPE:
+            SDL_Log("[recognizer] swipe");
+            break;
+    }
 }
 
 
 // timer
 Uint32 Hammer::setTimeout(Timer::Callback& callback, Uint32 timeout)
 {
-    return timer_.add(callback, Timer::TIMER_TIMEOUT, timeout);
+    uint32_t ret = timer_.add(callback, timeout, Timer::TIMER_TIMEOUT);
+    timer_.start();
+    return ret;
 }
 
 

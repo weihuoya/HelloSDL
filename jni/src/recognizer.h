@@ -17,14 +17,25 @@ public:
         TYPE_SWIPE,
     };
 
+    enum RECOGNIZE_STATE {
+        STATE_POSSIBLE,
+        STATE_BEGAN,
+        STATE_CHANGED,
+        STATE_RECOGNIZED,
+        STATE_CANCELLED,
+        STATE_FAILED,
+    };
+
     virtual ~Recognizer();
 
-    void recognize(Input * input);
-    void trigger(Input * input);
+    void recognize(const Input * input);
+    void trigger();
+
+    virtual uint32_t process(const Input * input);
+    virtual void reset();
 
 protected:
-    Recognizer();
-    virtual uint32_t process(Input * input);
+    Recognizer(RECOGNIZER_TYPE type);
 
     uint32_t type_;
     uint32_t state_;
@@ -38,7 +49,10 @@ public:
     virtual ~TapRecognizer();
 
 protected:
-    virtual uint32_t process(Input * input);
+    virtual uint32_t process(const Input * input);
+    virtual void reset();
+
+    uint32_t timer_;
 
     // previous
     float prevTimeStamp_;
@@ -63,15 +77,16 @@ public:
     virtual ~PanRecognizer();
 
 protected:
-    virtual uint32_t process(Input * input);
+    virtual uint32_t process(const Input * input);
+    virtual void reset();
 
     // config
     size_t pointers_;
     size_t threshold_;
     size_t direction_;
     //previous
-    size_t previousX_;
-    size_t previousY_;
+    float previousX_;
+    float previousY_;
 };
 
 
@@ -82,11 +97,12 @@ public:
     virtual ~PinchRecognizer();
 
 protected:
-    virtual uint32_t process(Input * input);
+    virtual uint32_t process(const Input * input);
+    virtual void reset();
 
     // config
     size_t pointers_;
-    size_t threshold_;
+    float threshold_;
 };
 
 
@@ -97,11 +113,12 @@ public:
     virtual ~RotateRecognizer();
 
 protected:
-    virtual uint32_t process(Input * input);
+    virtual uint32_t process(const Input * input);
+    virtual void reset();
 
     // config
     size_t pointers_;
-    size_t threshold_;
+    float threshold_;
 };
 
 
@@ -112,12 +129,12 @@ public:
     virtual ~SwipeRecognizer();
 
 protected:
-    virtual uint32_t process(Input * input);
+    virtual uint32_t process(const Input * input);
+    virtual void reset();
 
     // config
     size_t pointers_;
-    size_t threshold_;
-    size_t velocity_;
+    float threshold_;
     size_t direction_;
 };
 

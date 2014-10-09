@@ -41,7 +41,7 @@ public:
     Timer();
     ~Timer();
 
-    uint32_t add(const Callback& callback, TIMER_TYPE type, int delay);
+    uint32_t add(const Callback& callback, int delay, TIMER_TYPE type);
     void remove(uint32_t id);
 
     void start();

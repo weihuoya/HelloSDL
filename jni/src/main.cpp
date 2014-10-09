@@ -6,8 +6,6 @@
 #include "eventhandler.h"
 #include "glcontext.h"
 
-#include "timer.h"
-
 
 #if defined(__IPHONEOS__) || defined(__ANDROID__)
 #include <SDL_opengles.h>
@@ -18,7 +16,6 @@
 
 
 static int RunEventLoop(SDL_Window * window);
-static int testTimer();
 
 
 int main(int argc, char** argv)
@@ -51,7 +48,6 @@ int main(int argc, char** argv)
             SDL_WINDOW_FULLSCREEN | SDL_WINDOW_OPENGL | SDL_WINDOW_BORDERLESS
             );
 
-    //testTimer();
     RunEventLoop(window);
 
     SDL_DestroyWindow(window);
@@ -83,24 +79,3 @@ int RunEventLoop(SDL_Window * window)
     return 0;
 }
 
-
-static uint32_t timerId = 0;
-
-static void testInterval(uint32_t tick)
-{
-    SDL_Log("[timer] interval: %u", tick);
-}
-
-static void testTimeout(uint32_t tick)
-{
-    SDL_Log("[timer] timeout: %u", tick);
-    Timer::instance()->remove(timerId);
-}
-
-int testTimer()
-{
-    Timer * timer = Timer::instance();
-    timerId = timer->add(Timer::Callback(&testInterval), Timer::TIMER_INTERVAL, 100);
-    timer->add(Timer::Callback(&testTimeout), Timer::TIMER_TIMEOUT, 1000);
-    timer->start();
-}

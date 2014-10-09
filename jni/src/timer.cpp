@@ -26,7 +26,7 @@ Timer * Timer::instance()
 }
 
 
-uint32_t Timer::add(const Callback& callback, TIMER_TYPE type, int delay)
+uint32_t Timer::add(const Callback& callback, int delay, TIMER_TYPE type)
 {
     uint32_t id = uniqueId();
     slots_.emplace_back(type, id, (uint32_t)delay, callback);

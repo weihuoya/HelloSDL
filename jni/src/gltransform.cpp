@@ -6,7 +6,7 @@
 GLTransform::GLTransform()
 {
     // Depth
-    depth_ = -4.0f;
+    depth_ = 4.0f;
 
     // Scale
     scaleStart_ = scaleEnd_ = 1.0f;

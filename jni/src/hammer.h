@@ -7,8 +7,8 @@
 #include <utility>
 
 #include "gltool.h"
+#include "recognizer.h"
 #include "input.h"
-
 #include "timer.h"
 
 
@@ -33,7 +33,7 @@ public:
     Uint32 setTimeout(Timer::Callback& callback, Uint32 timeout);
     void clearTimeout(Uint32 slotId);
 
-    void trigger(uint32_t type, uint32_t state, const Input * input);
+    void trigger(uint32_t type);
 
     void OnPanEvent(const Input * input);
     void OnPinchEvent(const Input * input);
@@ -46,6 +46,8 @@ public:
 
 private:
     DISALLOW_IMPLICIT_CONSTRUCTORS(Hammer);
+
+    std::vector< std::shared_ptr<Recognizer> > recognizers_;
 
     Timer timer_;
 
