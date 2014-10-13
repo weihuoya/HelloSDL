@@ -81,7 +81,7 @@ void Hammer::OnTouchEvent(const SDL_TouchFingerEvent& event, const SDL_Touch * t
     }
     else //if(event.type == SDL_FINGERUP)
     {
-        isFinal = (numFingers == 0);
+        isFinal = (numFingers == 1);
         eventType = Input::INPUT_END;
     }
     //else
@@ -100,7 +100,6 @@ void Hammer::OnTouchEvent(const SDL_TouchFingerEvent& event, const SDL_Touch * t
     if(!firstInput_)
     {
         firstInput_ = input;
-        //needRelease = false;
     }
 
     if(numFingers == 1)
@@ -110,11 +109,6 @@ void Hammer::OnTouchEvent(const SDL_TouchFingerEvent& event, const SDL_Touch * t
         input->centerY = finger->y;
 
         firstMultiple_.reset();
-        /*if(firstMultiple_)
-        {
-            delete firstMultiple_;
-            firstMultiple_ = NULL;
-        }*/
     }
     else if(numFingers > 1)
     {
@@ -130,7 +124,6 @@ void Hammer::OnTouchEvent(const SDL_TouchFingerEvent& event, const SDL_Touch * t
 
         if(!firstMultiple_)
         {
-            //needRelease = false;
             firstMultiple_ = input;
         }
     }
@@ -138,7 +131,7 @@ void Hammer::OnTouchEvent(const SDL_TouchFingerEvent& event, const SDL_Touch * t
     input->timeStamp = event.timestamp;
     input->deltaTime = input->timeStamp - firstInput_->timeStamp;
 
-    if(firstMultiple_)
+    if(firstMultiple_ && numFingers > 1)
     {
         //scale
         float firstDistance;
@@ -146,12 +139,10 @@ void Hammer::OnTouchEvent(const SDL_TouchFingerEvent& event, const SDL_Touch * t
 
         deltaX = firstMultiple_->fingers[0]->x - firstMultiple_->fingers[1]->x;
         deltaY = firstMultiple_->fingers[0]->y - firstMultiple_->fingers[1]->y;
-        //firstDistance = sqrt(deltaX * deltaX + deltaY * deltaY);
         firstDistance = getDistance(deltaX, deltaY);
 
         deltaX = input->fingers[0]->x - input->fingers[1]->x;
         deltaY = input->fingers[0]->y - input->fingers[1]->y;
-        //currDistance = sqrt(deltaX * deltaX + deltaY * deltaY);
         currDistance = getDistance(deltaX, deltaY);
 
         input->scale = currDistance / firstDistance;
@@ -162,12 +153,10 @@ void Hammer::OnTouchEvent(const SDL_TouchFingerEvent& event, const SDL_Touch * t
 
         deltaX = firstMultiple_->fingers[0]->x - firstMultiple_->fingers[1]->x;
         deltaY = firstMultiple_->fingers[0]->y - firstMultiple_->fingers[1]->y;
-        //firstRotate = atan2(deltaY, deltaX) * 180 / M_PI;
         firstRotate = getRotate(deltaX, deltaY);
 
         deltaX = input->fingers[0]->x - input->fingers[1]->x;
         deltaY = input->fingers[0]->y - input->fingers[1]->y;
-        //currRotate = atan2(deltaY, deltaX) * 180 / M_PI;
         currRotate = getRotate(deltaX, deltaY);
 
         input->rotation = currRotate - firstRotate;
@@ -186,12 +175,10 @@ void Hammer::OnTouchEvent(const SDL_TouchFingerEvent& event, const SDL_Touch * t
     input->distance = getDistance(deltaX, deltaY);
     input->offsetDirection = getDirection(deltaX, deltaY);
 
-
     // compute interval
     if(!lastInterval_)
     {
         lastInterval_ = input;
-        //needRelease = false;
     }
 
     float deltaTime = input->timeStamp - lastInterval_->timeStamp;
@@ -222,7 +209,6 @@ void Hammer::OnTouchEvent(const SDL_TouchFingerEvent& event, const SDL_Touch * t
     input->velocityX = velocityX;
     input->velocityY = velocityY;
     input->direction = direction;
-
 
     this->recognize(input.get());
 

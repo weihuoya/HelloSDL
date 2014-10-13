@@ -145,7 +145,9 @@ int EventHandler::OnFingerEvent(const SDL_TouchFingerEvent& event)
     SDL_TouchID touchId = event.touchId;
     SDL_FingerID fingerId = event.fingerId;
 
-    SDL_Log("[finger] touchId: %lld, fingerId: %lld, timestamp: %u", touchId, fingerId, timestamp);
+    SDL_Log("[finger] event: %s, touchId: %lld, fingerId: %lld, timestamp: %u",
+            event.type == SDL_FINGERDOWN ? "down" : (event.type == SDL_FINGERUP ? "up" : "move"),
+            touchId, fingerId, timestamp);
 
     int i = 0;
     const SDL_Finger *finger = NULL;
